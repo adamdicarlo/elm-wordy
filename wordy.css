@@ -1,0 +1,52 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background: #F7F7F7;
+  font-family: sans-serif;
+}
+
+main {
+  display: flex;
+  font-size: 48px;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+h1 {
+  font-size: 64px;
+}
+
+.guess {
+  line-height: 1;
+  height: 1em;
+  margin: 0.5em 0;
+}
+
+.letters {
+  display: flex;
+  width: 6em;
+  flex-wrap: wrap;
+}
+
+.letter {
+  display: flex;
+  color: red;          
+  justify-content: center;
+  width: 2em;
+  line-height: 2em;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.selected {
+  background-color: red;
+  color: white;
+  cursor: default;
+}
+
+.foundWords {
+  list-style-type: none;
+  font-size: 24px;
+}

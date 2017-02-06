@@ -1,0 +1,12 @@
+{
+  "name": "elm-wordy",
+  "version": "1.0.0",
+  "description": "\"Worder\"-like game written in Elm",
+  "main": "src/Main.elm",
+  "repository": "https://github.com/adamdicarlo/elm-wordy.git",
+  "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
+  "license": "BSD3",
+  "dependencies": {
+    "elm-live": "^2.7.4"
+  }
+}
