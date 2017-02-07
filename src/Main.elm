@@ -8,6 +8,24 @@ import List.Extra exposing (findIndex)
 import Keyboard
 
 
+type Letter
+    = Letter Char Bool
+
+
+type alias Model =
+    { letters : List Letter
+    , reverseGuess : List ( Char, Int )
+    , foundWords : List String
+    }
+
+
+type Msg
+    = AddLetter Char Int
+    | Backspace
+    | SubmitGuess
+    | NoOp
+
+
 dictionary : List String
 dictionary =
     [ "ADO"
@@ -165,30 +183,12 @@ dictionary =
     ]
 
 
-type Letter
-    = Letter Char Bool
-
-
-type alias Model =
-    { letters : List Letter
-    , reverseGuess : List ( Char, Int )
-    , foundWords : List String
-    }
-
-
 initialModel : Model
 initialModel =
     { letters = stringToLetterList "dwnaorthr"
     , reverseGuess = []
     , foundWords = []
     }
-
-
-type Msg
-    = AddLetter Char Int
-    | Backspace
-    | SubmitGuess
-    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
