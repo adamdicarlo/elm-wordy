@@ -5,7 +5,7 @@
   "main": "src/Main.elm",
   "repository": "https://github.com/adamdicarlo/elm-wordy.git",
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
-  "license": "BSD3",
+  "license": "BSD-3-Clause",
   "scripts": {
     "start": "elm-live --open -- --yes src/Main.elm --output dist/wordy.elm.js"
   },
