@@ -372,7 +372,7 @@ subscriptions model =
 
 keyCodeToCmd : Model -> Keyboard.KeyCode -> Msg
 keyCodeToCmd model keyCode =
-    case (Debug.log "keyCode" keyCode) of
+    case keyCode of
         -- Enter key
         13 ->
             SubmitGuess
