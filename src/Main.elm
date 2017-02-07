@@ -3,6 +3,9 @@ module Wordy exposing (main)
 import Html exposing (Html, div, h1, text, button)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Char
+import List.Extra exposing (findIndex)
+import Keyboard
 
 
 dictionary : List String
@@ -173,8 +176,8 @@ type alias Model =
     }
 
 
-model : Model
-model =
+initialModel : Model
+initialModel =
     { letters = stringToLetterList "dwnaorthr"
     , reverseGuess = []
     , foundWords = []
@@ -185,6 +188,7 @@ type Msg
     = AddLetter Char Int
     | Backspace
     | SubmitGuess
+    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -226,6 +230,18 @@ update msg model =
                     , foundWords = newFoundWords
                 }
                     ! []
+
+        NoOp ->
+            model ! []
+
+
+findUnselectedLetter : List Letter -> Char -> Maybe Int
+findUnselectedLetter letters sought =
+    let
+        predicate (Letter ch selected) =
+            ch == sought && not selected
+    in
+        findIndex predicate letters
 
 
 validWord : String -> Bool
@@ -299,7 +315,7 @@ stringToLetterList str =
             []
 
         Just ( head, tail ) ->
-            Letter head False :: stringToLetterList tail
+            Letter (Char.toUpper head) False :: stringToLetterList tail
 
 
 guessToString : List ( Char, Int ) -> String
@@ -342,6 +358,37 @@ main =
     Html.program
         { view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
-        , init = model ! []
+        , subscriptions = subscriptions
+        , init = initialModel ! []
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Keyboard.downs <| keyCodeToCmd model
+        ]
+
+
+keyCodeToCmd : Model -> Keyboard.KeyCode -> Msg
+keyCodeToCmd model keyCode =
+    case (Debug.log "keyCode" keyCode) of
+        -- Enter key
+        13 ->
+            SubmitGuess
+
+        -- Backspace key
+        8 ->
+            Backspace
+
+        _ ->
+            let
+                ch =
+                    Char.fromCode keyCode |> Char.toUpper
+            in
+                case findUnselectedLetter model.letters ch of
+                    Just index ->
+                        AddLetter ch index
+
+                    Nothing ->
+                        NoOp
