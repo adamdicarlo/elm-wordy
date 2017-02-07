@@ -7,7 +7,8 @@
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "start": "elm-live --open -- --yes src/Main.elm --output dist/wordy.elm.js"
+    "start": "elm-live --open -- --yes src/Main.elm --output dist/wordy.elm.js",
+    "build": "./build.sh"
   },
   "dependencies": {
     "elm-live": "^2.7.4"
