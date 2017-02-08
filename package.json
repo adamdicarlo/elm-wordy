@@ -2,15 +2,13 @@
   "name": "elm-wordy",
   "version": "1.0.0",
   "description": "\"Worder\"-like game written in Elm",
-  "main": "src/Main.elm",
+  "main": "src/index.js",
   "repository": "https://github.com/adamdicarlo/elm-wordy.git",
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "start": "elm-live --open -- --yes src/Main.elm --output dist/wordy.elm.js",
-    "build": "./build.sh"
-  },
-  "dependencies": {
-    "elm-live": "^2.7.4"
+    "start": "elm-app start",
+    "build": "elm-app build",
+    "test": "elm-app test"
   }
 }
