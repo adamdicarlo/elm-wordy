@@ -1,4 +1,4 @@
-module Wordy exposing (main)
+module Main exposing (main)
 
 import Html exposing (Html, div, h1, text, button)
 import Html.Attributes exposing (class)
