@@ -1,4 +1,8 @@
 node_modules
 dist
+
 elm-stuff/*
 !elm-stuff/exact-dependencies.json
+
+tests/elm-stuff/*
+!tests/elm-stuff/exact-dependencies.json
