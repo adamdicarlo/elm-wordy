@@ -9,7 +9,6 @@ html, body {
 
 main {
   display: flex;
-  font-size: 48px;
   justify-content: center;
   margin-top: 60px;
 }
@@ -30,18 +29,14 @@ button {
   margin: 0.5em 0;
 }
 
-.letters {
-  display: flex;
-  width: 6em;
-  flex-wrap: wrap;
-}
-
 .letter {
-  display: flex;
   color: red;          
+  display: inline-flex;
+  font-size: 64px;
+  font-weight: bold;
   justify-content: center;
-  width: 2em;
-  line-height: 2em;
+  width: 96px;
+  line-height: 96px;
   border: 1px solid black;
   cursor: pointer;
 }

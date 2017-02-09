@@ -328,7 +328,14 @@ guessToString cs =
 
 viewLetters : List Letter -> Html Msg
 viewLetters letters =
-    div [ class "letters" ] (List.indexedMap viewLetter letters)
+    let
+        rows =
+            letters
+                |> List.indexedMap viewLetter
+                |> List.Extra.groupsOf 3
+    in
+        -- Wrap each group (3 letters) into a "row" div
+        div [ class "letters" ] <| List.map (div [ class "letter-row" ]) rows
 
 
 viewLetter : Int -> Letter -> Html Msg
