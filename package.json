@@ -10,5 +10,8 @@
     "start": "elm-app start",
     "build": "elm-app build",
     "test": "elm-app test"
+  },
+  "dependencies": {
+    "create-elm-app": "^0.3.1"
   }
 }
