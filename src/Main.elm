@@ -341,14 +341,13 @@ viewLetters letters =
 viewLetter : Int -> Letter -> Html Msg
 viewLetter index (Letter ch selected) =
     let
-        attrs =
-            [ class "letter" ]
-                ++ if selected then
-                    [ class "selected" ]
-                   else
-                    [ onClick (AddLetter ch index) ]
+        extraAttr =
+            if selected then
+                [ class "selected" ]
+            else
+                [ onClick (AddLetter ch index) ]
     in
-        div attrs [ text (ch |> String.fromChar |> String.toUpper) ]
+        div ([ class "letter" ] ++ extraAttr) [ text (ch |> String.fromChar |> String.toUpper) ]
 
 
 viewFoundWords : List String -> Html Msg
