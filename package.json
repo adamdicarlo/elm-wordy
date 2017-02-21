@@ -7,8 +7,8 @@
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "start": "elm-app start",
-    "build": "elm-app build",
+    "start": "scripts/generate-dictionary-json.js && elm-app start",
+    "build": "elm-app build && scripts/generate-dictionary-json.js && mv dictionary.json dist/",
     "test": "elm-app test"
   },
   "dependencies": {

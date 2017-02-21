@@ -1,8 +1,9 @@
 module Model exposing (..)
 
-import Char
-import List.Extra exposing (findIndex)
+import Http
+import RemoteData exposing (..)
 import Letter exposing (..)
+import Dictionary exposing (..)
 
 
 type Screen
@@ -10,12 +11,17 @@ type Screen
     | Game
 
 
-type alias Model =
-    { screen : Screen
-    , dictionary : List String
+type alias GameModel =
+    { dictionary : WebData Dictionary
     , letters : List Letter
     , reverseGuess : List ( Char, Int )
     , foundWords : List String
+    }
+
+
+type alias Model =
+    { screen : Screen
+    , game : GameModel
     }
 
 
@@ -23,18 +29,29 @@ type Msg
     = AddLetter Char Int
     | Backspace
     | SubmitGuess
+    | DictionaryResponse (WebData DictionaryResponse)
+    | NewGame
     | NoOp
 
 
 init : ( Model, Cmd Msg )
 init =
     { screen = Menu
-    , dictionary = []
-    , letters = stringToLetterList "dwnaorthr"
-    , reverseGuess = []
-    , foundWords = []
+    , game =
+        { dictionary = Loading
+        , letters = []
+        , reverseGuess = []
+        , foundWords = []
+        }
     }
-        ! []
+        ! [ getDictionary ]
+
+
+getDictionary : Cmd Msg
+getDictionary =
+    Http.get "/dictionary.json" decodeDictionary
+        |> RemoteData.sendRequest
+        |> Cmd.map DictionaryResponse
 
 
 guessToString : List ( Char, Int ) -> String
@@ -42,14 +59,3 @@ guessToString cs =
     List.map (\t -> Tuple.first t) cs
         |> String.fromList
         |> String.reverse
-        |> String.toUpper
-
-
-stringToLetterList : String -> List Letter
-stringToLetterList str =
-    case String.uncons str of
-        Nothing ->
-            []
-
-        Just ( head, tail ) ->
-            Letter (Char.toUpper head) False :: stringToLetterList tail
