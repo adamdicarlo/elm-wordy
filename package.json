@@ -13,5 +13,11 @@
   },
   "dependencies": {
     "create-elm-app": "^0.3.1"
+  },
+  "devDependencies": {
+    "split2": "^2.1.1",
+    "through2": "^2.0.3",
+    "through2-filter": "^2.0.0",
+    "through2-map": "^3.0.0"
   }
 }
