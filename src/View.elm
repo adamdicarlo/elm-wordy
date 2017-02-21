@@ -3,7 +3,8 @@ module View exposing (view)
 import Html exposing (Html, div, h1, h2, text, button)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import List.Extra exposing (findIndex)
+import List.Extra
+import RemoteData
 import Letter exposing (..)
 import Model exposing (..)
 
@@ -11,30 +12,45 @@ import Model exposing (..)
 view : Model -> Html Msg
 view model =
     case model.screen of
-        Menu ->
+        Model.Menu ->
             viewMenu model
 
-        Game ->
-            viewGame model
+        Model.Game ->
+            viewGame model.game
 
 
+viewMenu : Model -> Html Msg
 viewMenu model =
-    div []
-        [ h1 [] [ text "Wordy" ]
-        , h2 [] [ text "Loading..." ]
-        ]
+    let
+        content =
+            case model.game.dictionary of
+                RemoteData.NotAsked ->
+                    [ h2 [] [ text "Starting" ] ]
+
+                RemoteData.Loading ->
+                    [ h2 [] [ text "Loading..." ] ]
+
+                RemoteData.Failure err ->
+                    [ text ("Error: " ++ toString err) ]
+
+                RemoteData.Success _ ->
+                    [ button [ onClick NewGame ] [ text "New Game" ] ]
+    in
+        div []
+            ([ h1 [] [ text "Wordy" ] ] ++ content)
 
 
-viewGame model =
+viewGame : GameModel -> Html Msg
+viewGame game =
     div []
         [ h1 [] [ text "Wordy" ]
-        , viewLetters model.letters
-        , div [ class "guess" ] [ text <| guessToString model.reverseGuess ]
+        , viewLetters game.letters
+        , div [ class "guess" ] [ guessToString game.reverseGuess |> String.toUpper |> text ]
         , div []
             [ button [ onClick Backspace ] [ text "Backspace" ]
             , button [ onClick SubmitGuess ] [ text "Submit word" ]
             ]
-        , viewFoundWords model.foundWords
+        , viewFoundWords game.foundWords
         ]
 
 
@@ -66,6 +82,6 @@ viewFoundWords : List String -> Html Msg
 viewFoundWords foundWords =
     let
         children =
-            List.map (\w -> Html.li [] [ text w ]) foundWords
+            List.map (\w -> Html.li [] [ text <| String.toUpper w ]) foundWords
     in
         Html.ol [ class "foundWords" ] children

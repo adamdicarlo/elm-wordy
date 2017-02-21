@@ -3,26 +3,59 @@ module Update exposing (keyCodeToCmd, update)
 import Char
 import List.Extra exposing (findIndex)
 import Keyboard
+import Dict exposing (Dict)
+import Dictionary exposing (..)
 import Letter exposing (..)
 import Model exposing (Model, Msg(..), guessToString)
+import RemoteData
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg ({ screen, game } as model) =
     case msg of
+        DictionaryResponse response ->
+            case response of
+                RemoteData.Success data ->
+                    { model
+                        | game =
+                            { game
+                                | dictionary =
+                                    RemoteData.Success (dictionaryFromResponse data.dictionary)
+                            }
+                    }
+                        ! []
+
+                RemoteData.Failure err ->
+                    { model
+                        | game =
+                            { game
+                                | dictionary = RemoteData.Failure err
+                            }
+                    }
+                        ! []
+
+                _ ->
+                    Debug.crash "Unexpected RemoteData response"
+
         AddLetter ch index ->
             { model
-                | reverseGuess = ( ch, index ) :: model.reverseGuess
-                , letters = markAtIndex index model.letters
+                | game =
+                    { game
+                        | reverseGuess = ( ch, index ) :: game.reverseGuess
+                        , letters = markAtIndex index game.letters
+                    }
             }
                 ! []
 
         Backspace ->
-            case model.reverseGuess of
+            case game.reverseGuess of
                 ( ch, index ) :: ls ->
                     { model
-                        | reverseGuess = ls
-                        , letters = unmarkAtIndex index model.letters
+                        | game =
+                            { game
+                                | reverseGuess = ls
+                                , letters = unmarkAtIndex index game.letters
+                            }
                     }
                         ! []
 
@@ -32,23 +65,53 @@ update msg model =
         SubmitGuess ->
             let
                 guess =
-                    guessToString model.reverseGuess
+                    guessToString game.reverseGuess
 
                 newFoundWords =
-                    if validWord guess model.dictionary && eligibleWord guess model.foundWords then
-                        guess :: model.foundWords
-                    else
-                        model.foundWords
+                    case game.dictionary of
+                        RemoteData.Success dictionary ->
+                            if validWord guess dictionary && eligibleWord guess game.foundWords then
+                                guess :: game.foundWords
+                            else
+                                game.foundWords
+
+                        _ ->
+                            Debug.crash "No dictionary"
             in
                 { model
-                    | reverseGuess = []
-                    , letters = unmarkAll model.letters
-                    , foundWords = newFoundWords
+                    | game =
+                        { game
+                            | reverseGuess = []
+                            , letters = unmarkAll game.letters
+                            , foundWords = newFoundWords
+                        }
                 }
                     ! []
 
+        NewGame ->
+            { model
+                | screen = Model.Game
+                , game =
+                    { game
+                        | letters = stringToLetterList "efinerrgt"
+                        , reverseGuess = []
+                        , foundWords = []
+                    }
+            }
+                ! []
+
         NoOp ->
             model ! []
+
+
+stringToLetterList : String -> List Letter
+stringToLetterList str =
+    case String.uncons str of
+        Nothing ->
+            []
+
+        Just ( head, tail ) ->
+            Letter (Char.toLower head) False :: stringToLetterList tail
 
 
 findUnselectedLetter : List Letter -> Char -> Maybe Int
@@ -60,9 +123,9 @@ findUnselectedLetter letters sought =
         findIndex predicate letters
 
 
-validWord : String -> List String -> Bool
+validWord : String -> Dictionary -> Bool
 validWord word dictionary =
-    List.member word dictionary
+    Dict.member word dictionary
 
 
 eligibleWord : String -> List String -> Bool
@@ -124,9 +187,9 @@ keyCodeToCmd model keyCode =
         _ ->
             let
                 ch =
-                    Char.fromCode keyCode |> Char.toUpper
+                    Char.fromCode keyCode |> Char.toLower
             in
-                case findUnselectedLetter model.letters ch of
+                case findUnselectedLetter model.game.letters ch of
                     Just index ->
                         AddLetter ch index
 

@@ -7,6 +7,11 @@ import Update exposing (keyCodeToCmd)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Keyboard.downs <| keyCodeToCmd model
-        ]
+    case model.screen of
+        Model.Game ->
+            Sub.batch
+                [ Keyboard.downs <| keyCodeToCmd model
+                ]
+
+        _ ->
+            Sub.none
