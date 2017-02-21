@@ -1,7 +1,10 @@
 module Main exposing (main)
 
 import Html exposing (Html)
-import App exposing (Model, Msg, init, subscriptions, update, view)
+import Model exposing (Model, Msg, init)
+import Subscriptions exposing (subscriptions)
+import Update exposing (update)
+import View exposing (view)
 
 
 main : Program Never Model Msg
