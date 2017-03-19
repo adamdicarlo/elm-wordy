@@ -1,6 +1,5 @@
 module Dictionary exposing (..)
 
-import Array exposing (Array)
 import Dict exposing (Dict)
 import Json.Decode
 import Json.Decode.Pipeline
