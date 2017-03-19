@@ -12,7 +12,7 @@
     "test": "elm-app test"
   },
   "dependencies": {
-    "create-elm-app": "^0.3.1"
+    "create-elm-app": "^0.3.2"
   },
   "devDependencies": {
     "split2": "^2.1.1",
