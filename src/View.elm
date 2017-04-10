@@ -1,12 +1,17 @@
 module View exposing (view)
 
 import Html exposing (Html, div, h1, h2, text, button)
-import Html.Attributes exposing (class)
+import Html.CssHelpers
 import Html.Events exposing (onClick)
 import List.Extra
 import RemoteData
 import Letter exposing (..)
 import Model exposing (..)
+import Styles
+
+
+{ id, class, classList } =
+    Html.CssHelpers.withNamespace "wordy"
 
 
 view : Model -> Html Msg
@@ -45,7 +50,7 @@ viewGame game =
     div []
         [ h1 [] [ text "Wordy" ]
         , viewLetters game.letters
-        , div [ class "guess" ] [ guessToString game.reverseGuess |> String.toUpper |> text ]
+        , div [ class [ Styles.Guess ] ] [ guessToString game.reverseGuess |> String.toUpper |> text ]
         , div []
             [ button [ onClick Backspace ] [ text "Backspace" ]
             , button [ onClick SubmitGuess ] [ text "Submit word" ]
@@ -63,7 +68,7 @@ viewLetters letters =
                 |> List.Extra.groupsOf 3
     in
         -- Wrap each group (3 letters) into a "row" div
-        div [ class "letters" ] <| List.map (div [ class "letter-row" ]) rows
+        div [ class [ Styles.Letters ] ] <| List.map (div [ class [ Styles.LetterRow ] ]) rows
 
 
 viewLetter : Int -> Letter -> Html Msg
@@ -71,11 +76,11 @@ viewLetter index (Letter ch selected) =
     let
         extraAttr =
             if selected then
-                [ class "selected" ]
+                [ class [ Styles.Selected ] ]
             else
                 [ onClick (AddLetter ch index) ]
     in
-        div ([ class "letter" ] ++ extraAttr) [ text (ch |> String.fromChar |> String.toUpper) ]
+        div ([ class [ Styles.Letter ] ] ++ extraAttr) [ text (ch |> String.fromChar |> String.toUpper) ]
 
 
 viewFoundWords : List String -> Html Msg
@@ -84,4 +89,4 @@ viewFoundWords foundWords =
         children =
             List.map (\w -> Html.li [] [ text <| String.toUpper w ]) foundWords
     in
-        Html.ol [ class "foundWords" ] children
+        Html.ol [ class [ Styles.FoundWords ] ] children
