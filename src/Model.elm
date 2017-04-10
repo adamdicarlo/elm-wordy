@@ -26,11 +26,16 @@ type alias Model =
 
 
 type Msg
-    = AddLetter Char Int
+    = -- User action: Adds the letter (Char) from a position (Int) to the guess
+      AddLetter Char Int
+      -- User action: Erase last letter of guess
     | Backspace
+      -- User action: Submit the guess
     | SubmitGuess
-    | DictionaryResponse (WebData DictionaryResponse)
+      -- User action: Start a new game
     | NewGame
+      -- AJAX response for dictionary (uses RemoteData package)
+    | DictionaryResponse (WebData DictionaryResponse)
     | NoOp
 
 
