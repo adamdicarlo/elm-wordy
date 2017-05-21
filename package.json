@@ -15,6 +15,7 @@
     "create-elm-app": "^0.3.2"
   },
   "devDependencies": {
+    "elm-analyse": "^0.7.0",
     "split2": "^2.1.1",
     "through2": "^2.0.3",
     "through2-filter": "^2.0.0",
