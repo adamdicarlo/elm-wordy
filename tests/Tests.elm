@@ -2,7 +2,6 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import String
 import Update exposing (update)
 import Model exposing (guessToString, init, GameModel, Model, Msg(..))
 

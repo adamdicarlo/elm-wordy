@@ -4,14 +4,14 @@ import Char
 import List.Extra exposing (findIndex)
 import Keyboard
 import Dict exposing (Dict)
-import Dictionary exposing (..)
+import Dictionary exposing (Dictionary, dictionaryFromResponse)
 import Letter exposing (..)
 import Model exposing (Model, Msg(..), guessToString)
 import RemoteData
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ screen, game } as model) =
+update msg ({ game } as model) =
     case msg of
         DictionaryResponse response ->
             case response of
@@ -136,7 +136,7 @@ eligibleWord word foundWords =
 markAtIndex : Int -> List Letter -> List Letter
 markAtIndex index letters =
     case letters of
-        ((Letter ch selected) as letter) :: rest ->
+        ((Letter ch _) as letter) :: rest ->
             (if index == 0 then
                 Letter ch True
              else
@@ -151,7 +151,7 @@ markAtIndex index letters =
 unmarkAtIndex : Int -> List Letter -> List Letter
 unmarkAtIndex index letters =
     case letters of
-        ((Letter ch selected) as letter) :: rest ->
+        ((Letter ch _) as letter) :: rest ->
             (if index == 0 then
                 Letter ch False
              else
@@ -167,7 +167,7 @@ unmarkAll : List Letter -> List Letter
 unmarkAll letters =
     case letters of
         (Letter ch _) :: rest ->
-            (Letter ch False) :: unmarkAll rest
+            Letter ch False :: unmarkAll rest
 
         [] ->
             []
