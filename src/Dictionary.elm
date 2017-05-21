@@ -1,4 +1,10 @@
-module Dictionary exposing (..)
+module Dictionary
+    exposing
+        ( Dictionary
+        , DictionaryResponse
+        , decodeDictionary
+        , dictionaryFromResponse
+        )
 
 import Dict exposing (Dict)
 import Json.Decode
@@ -19,7 +25,7 @@ decodeDictionary =
     Json.Decode.Pipeline.decode DictionaryResponse
         |> Json.Decode.Pipeline.required "dictionary" (Json.Decode.list Json.Decode.string)
 
-
+dictionaryFromResponse : List String -> Dictionary
 dictionaryFromResponse response =
     List.map (\word -> ( word, () )) response
         |> Dict.fromList

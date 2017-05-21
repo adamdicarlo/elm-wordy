@@ -3,7 +3,7 @@ module Model exposing (..)
 import Http
 import RemoteData exposing (..)
 import Letter exposing (..)
-import Dictionary exposing (..)
+import Dictionary exposing (Dictionary, DictionaryResponse, decodeDictionary)
 
 
 type Screen
