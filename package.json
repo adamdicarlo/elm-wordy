@@ -12,7 +12,7 @@
     "test": "elm-app test"
   },
   "dependencies": {
-    "create-elm-app": "^0.3.2"
+    "create-elm-app": "^0.8.6"
   },
   "devDependencies": {
     "elm-analyse": "^0.7.0",
