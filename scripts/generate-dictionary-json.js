@@ -7,10 +7,10 @@ const filter = require('through2-filter')
 const map = require('through2-map')
 const through = require('through2')
 
-fs.createReadStream('/usr/share/dict/web2')
+fs.createReadStream(path.resolve(__dirname, '../vendor/dolph/dictionary/popular.txt'))
   .pipe(split())
   .pipe(filter({wantStrings: true}, (rawWord) => {
-    return rawWord.length >= 3 && rawWord.length <= 9 && rawWord === rawWord.toLowerCase()
+    return rawWord.length >= 3 && rawWord.length <= 9
   }))
   .pipe(map({wantStrings: true}, (rawWord, index) => {
     const word = JSON.stringify(rawWord)
