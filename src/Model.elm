@@ -32,10 +32,14 @@ type Msg
     | Backspace
       -- User action: Submit the guess
     | SubmitGuess
+      -- User action: Shuffle the board
+    | Shuffle
       -- User action: Start a new game
     | NewGame
       -- AJAX response for dictionary (uses RemoteData package)
     | DictionaryResponse (WebData DictionaryResponse)
+      -- RNG response: Numbers used for shuffling letters
+    | ShuffleOrdering (List Int)
     | NoOp
 
 

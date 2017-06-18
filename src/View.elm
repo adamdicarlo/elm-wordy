@@ -48,6 +48,7 @@ viewGame game =
         , div [ class "guess" ] [ guessToString game.reverseGuess |> String.toUpper |> text ]
         , div []
             [ button [ onClick Backspace ] [ text "Backspace" ]
+            , button [ onClick Shuffle ] [ text "Shuffle" ]
             , button [ onClick SubmitGuess ] [ text "Submit word" ]
             ]
         , viewFoundWords game.foundWords
