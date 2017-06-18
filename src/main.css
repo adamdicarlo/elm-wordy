@@ -1,9 +1,16 @@
-* {
+/**
+ * Universal box-sizing with inheritance.
+ * See https://css-tricks.com/box-sizing/#article-header-id-6
+ */
+html {
   box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 html, body {
-  background: #F7F7F7;
+  background: #F0F0F0;
   font-family: sans-serif;
 }
 
