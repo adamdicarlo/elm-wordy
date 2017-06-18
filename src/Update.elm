@@ -7,7 +7,9 @@ import Dict exposing (Dict)
 import Dictionary exposing (Dictionary, dictionaryFromResponse)
 import Letter exposing (..)
 import Model exposing (Model, Msg(..), guessToString)
+import Random
 import RemoteData
+import Tuple exposing (first, second)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -88,6 +90,19 @@ update msg ({ game } as model) =
                 }
                     ! []
 
+        Shuffle ->
+            let
+                generator =
+                    Random.int 0 100
+
+                randoms =
+                    Random.list (List.length model.game.letters) generator
+            in
+                ( model, Random.generate ShuffleOrdering randoms )
+
+        ShuffleOrdering values ->
+            { model | game = { game | letters = shuffle game.letters values } } ! []
+
         NewGame ->
             { model
                 | screen = Model.Game
@@ -102,6 +117,19 @@ update msg ({ game } as model) =
 
         NoOp ->
             model ! []
+
+
+shuffle : List Letter -> List Int -> List Letter
+shuffle letters randoms =
+    let
+        zipped : List ( Int, Letter )
+        zipped =
+            List.map2 (,) randoms letters
+
+        sorted =
+            List.sortBy first zipped
+    in
+        List.unzip sorted |> second
 
 
 stringToLetterList : String -> List Letter
