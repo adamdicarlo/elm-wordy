@@ -1,12 +1,13 @@
 module View exposing (view)
 
-import Html exposing (Html, div, h1, h2, text, button)
-import Html.Attributes exposing (class)
+import Html exposing (Html, div, h1, h2, text)
+import Html.Attributes exposing (attribute, class)
 import Html.Events exposing (onClick)
 import List.Extra
 import RemoteData
 import Letter exposing (..)
 import Model exposing (..)
+import UI exposing (button, largeButton, letterButton, selectedLetterButton)
 
 
 view : Model -> Html Msg
@@ -34,7 +35,7 @@ viewMenu model =
                     [ text ("Error: " ++ toString err) ]
 
                 RemoteData.Success _ ->
-                    [ button [ onClick NewGame ] [ text "New Game" ] ]
+                    [ largeButton [ onClick NewGame ] [ text "New Game" ] ]
     in
         div []
             ([ h1 [] [ text "Wordy" ] ] ++ content)
@@ -46,7 +47,7 @@ viewGame game =
         [ h1 [] [ text "Wordy" ]
         , viewLetters game.letters
         , div [ class "guess" ] [ guessToString game.reverseGuess |> String.toUpper |> text ]
-        , div []
+        , div [ class "primaryButtons" ]
             [ button [ onClick Backspace ] [ text "Backspace" ]
             , button [ onClick Shuffle ] [ text "Shuffle" ]
             , button [ onClick SubmitGuess ] [ text "Submit word" ]
@@ -64,19 +65,19 @@ viewLetters letters =
                 |> List.Extra.groupsOf 3
     in
         -- Wrap each group (3 letters) into a "row" div
-        div [ class "letters" ] <| List.map (div [ class "letter-row" ]) rows
+        div [ class "letterGrid", attribute "unselectable" "on" ] <| List.map (div [ class "letterRow" ]) rows
 
 
 viewLetter : Int -> Letter -> Html Msg
 viewLetter index (Letter ch selected) =
     let
-        extraAttr =
+        element =
             if selected then
-                [ class "selected" ]
+                selectedLetterButton []
             else
-                [ onClick (AddLetter ch index) ]
+                letterButton [ onClick (AddLetter ch index) ]
     in
-        div ([ class "letter" ] ++ extraAttr) [ text (ch |> String.fromChar |> String.toUpper) ]
+        element [ text (ch |> String.fromChar |> String.toUpper) ]
 
 
 viewFoundWords : List String -> Html Msg

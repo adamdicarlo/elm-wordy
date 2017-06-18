@@ -13,32 +13,10 @@ main {
   margin-top: 60px;
 }
 
-h1 {
-  font-size: 64px;
-}
-
-button {
-  font-size: 22px;
-  line-height: 1.5;
-  padding: 0 10px;
-}
-
 .guess {
   line-height: 1;
   height: 1em;
   margin: 0.5em 0;
-}
-
-.letter {
-  color: red;          
-  display: inline-flex;
-  font-size: 64px;
-  font-weight: bold;
-  justify-content: center;
-  width: 96px;
-  line-height: 96px;
-  border: 1px solid black;
-  cursor: pointer;
 }
 
 .selected {
