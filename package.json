@@ -10,6 +10,7 @@
     "postinstall": "elm-install",
     "start": "scripts/generate-dictionary-json.js && elm-app start",
     "build": "elm-app build && scripts/generate-dictionary-json.js && mv dictionary.json dist/",
+    "lint": "elm-analyse",
     "test": "elm-app test"
   },
   "dependencies": {
