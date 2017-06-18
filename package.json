@@ -7,12 +7,14 @@
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
+    "postinstall": "elm-install",
     "start": "scripts/generate-dictionary-json.js && elm-app start",
     "build": "elm-app build && scripts/generate-dictionary-json.js && mv dictionary.json dist/",
     "test": "elm-app test"
   },
   "dependencies": {
-    "create-elm-app": "^0.8.6"
+    "create-elm-app": "^0.8.6",
+    "elm-github-install": "^1.0.1"
   },
   "devDependencies": {
     "elm-analyse": "^0.7.0",
