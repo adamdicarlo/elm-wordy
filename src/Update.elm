@@ -7,8 +7,8 @@ import Dict exposing (Dict)
 import Dictionary exposing (Dictionary, dictionaryFromResponse)
 import Letter exposing (..)
 import Model exposing (Model, Msg(..), guessToString)
-import Random
-import RemoteData
+import Random exposing (Generator)
+import RemoteData exposing (WebData)
 import Tuple exposing (first, second)
 
 
@@ -93,34 +93,83 @@ update msg ({ game } as model) =
         Shuffle ->
             let
                 generator =
-                    Random.int 0 100
-
-                randoms =
-                    Random.list (List.length model.game.letters) generator
+                    shuffleWordGenerator (List.length model.game.letters)
             in
-                ( model, Random.generate ShuffleOrdering randoms )
+                model ! [ Random.generate ShuffleOrdering generator ]
 
         ShuffleOrdering values ->
-            { model | game = { game | letters = shuffle game.letters values } } ! []
+            { model | game = { game | letters = shuffle values game.letters } } ! []
 
         NewGame ->
-            { model
-                | screen = Model.Game
-                , game =
-                    { game
-                        | letters = stringToLetterList "efinerrgt"
-                        , reverseGuess = []
-                        , foundWords = []
-                    }
-            }
-                ! []
+            let
+                generator =
+                    Random.pair (selectWordGenerator game.dictionary) (shuffleWordGenerator 9)
+            in
+                model ! [ Random.generate NewGameNumbers generator ]
+
+        NewGameNumbers ( wordIndex, shuffleNumbers ) ->
+            let
+                letters =
+                    nineLetterWords game.dictionary
+                        |> Dict.keys
+                        |> List.drop wordIndex
+                        |> List.head
+                        |> Maybe.withDefault fallbackWord
+                        |> stringToLetterList
+                        |> shuffle shuffleNumbers
+            in
+                { model
+                    | screen = Model.Game
+                    , game =
+                        { game
+                            | letters = letters
+                            , reverseGuess = []
+                            , foundWords = []
+                        }
+                }
+                    ! []
 
         NoOp ->
             model ! []
 
 
-shuffle : List Letter -> List Int -> List Letter
-shuffle letters randoms =
+fallbackWord : String
+fallbackWord =
+    "flowering"
+
+
+nineLetterWords : WebData Dictionary -> Dictionary
+nineLetterWords dictionary =
+    let
+        fallback : Dictionary
+        fallback =
+            Dict.singleton fallbackWord ()
+
+        predicate : String -> () -> Bool
+        predicate word _ =
+            String.length word == 9
+    in
+        RemoteData.toMaybe dictionary
+            |> Maybe.withDefault fallback
+            |> Dict.filter predicate
+
+
+selectWordGenerator : WebData Dictionary -> Generator Int
+selectWordGenerator dictionary =
+    let
+        nineLetterWordCount =
+            Dict.size (nineLetterWords dictionary)
+    in
+        Random.int 0 (nineLetterWordCount - 1)
+
+
+shuffleWordGenerator : Int -> Generator (List Int)
+shuffleWordGenerator wordLength =
+    Random.list wordLength (Random.int 0 100)
+
+
+shuffle : List Int -> List Letter -> List Letter
+shuffle randoms letters =
     let
         zipped : List ( Int, Letter )
         zipped =
