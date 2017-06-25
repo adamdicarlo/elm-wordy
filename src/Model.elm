@@ -40,6 +40,9 @@ type Msg
     | DictionaryResponse (WebData DictionaryResponse)
       -- RNG response: Numbers used for shuffling letters
     | ShuffleOrdering (List Int)
+      -- RNG response: Numbers used for picking a 9-letter word, then shuffling it, when
+      -- starting a new game
+    | NewGameNumbers ( Int, List Int )
     | NoOp
 
 
