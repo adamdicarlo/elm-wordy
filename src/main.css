@@ -32,6 +32,11 @@ main {
   cursor: default;
 }
 
+.primaryButtons {
+  display: flex;
+  justify-content: space-between;
+}
+
 .foundWords {
   list-style-type: none;
   font-size: 24px;
