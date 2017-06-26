@@ -2,12 +2,28 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
+import Dict
+import RemoteData exposing (WebData)
+import Letter exposing (Letter(..))
+import Model exposing (guessToString, init, isWordInBoard, stringToLetterList, totalWords, GameModel, Model, Msg(..))
 import Update exposing (update)
-import Model exposing (guessToString, init, GameModel, Model, Msg(..))
 
 
 start =
     Tuple.first init
+
+
+dictionary =
+    -- Four words that match 9-letter "flowering" (including "flowering" itself)
+    Dict.singleton "flowering" ()
+        |> Dict.insert "flow" ()
+        |> Dict.insert "wolf" ()
+        |> Dict.insert "lower" ()
+        -- and some words that don't.
+        |> Dict.insert "hay" ()
+        |> Dict.insert "success" ()
+        |> Dict.insert "partition" ()
+        |> RemoteData.Success
 
 
 updateModel : Msg -> Model -> Model
@@ -75,4 +91,23 @@ all =
         , test "guessToString with empty guess" <|
             \() ->
                 Expect.equal (guessToString []) ""
+        , test "isWordInBoard 'wolf' 'flowering'" <|
+            \() ->
+                Expect.equal (isWordInBoard "wolf" (String.toList "flowering")) True
+        , test "isWordInBoard 'cowering' 'flowering'" <|
+            \() ->
+                Expect.equal (isWordInBoard "cowering" (String.toList "flowering")) False
+        , test "isWordInBoard 'floweringf' 'flowering'" <|
+            \() ->
+                Expect.equal (isWordInBoard "floweringf" (String.toList "flowering")) False
+        , test "isWordInBoard 'grew' 'flowering'" <|
+            \() ->
+                Expect.equal (isWordInBoard "grew" (String.toList "flowering")) True
+        , test "totalWords" <|
+            \() ->
+                let
+                    letters =
+                        stringToLetterList "flowering"
+                in
+                    Expect.equal (totalWords dictionary letters) 4
         ]

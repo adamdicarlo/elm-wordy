@@ -6,7 +6,7 @@ import Keyboard
 import Dict exposing (Dict)
 import Dictionary exposing (Dictionary, dictionaryFromResponse)
 import Letter exposing (..)
-import Model exposing (Model, Msg(..), guessToString)
+import Model exposing (Model, Msg(..), fallbackWord, getWords, guessToString, stringToLetterList, totalWords)
 import Random exposing (Generator)
 import RemoteData exposing (WebData)
 import Tuple exposing (first, second)
@@ -123,6 +123,7 @@ update msg ({ game } as model) =
                     , game =
                         { game
                             | letters = letters
+                            , totalWords = totalWords game.dictionary letters
                             , reverseGuess = []
                             , foundWords = []
                         }
@@ -133,24 +134,14 @@ update msg ({ game } as model) =
             model ! []
 
 
-fallbackWord : String
-fallbackWord =
-    "flowering"
-
-
 nineLetterWords : WebData Dictionary -> Dictionary
 nineLetterWords dictionary =
     let
-        fallback : Dictionary
-        fallback =
-            Dict.singleton fallbackWord ()
-
         predicate : String -> () -> Bool
         predicate word _ =
             String.length word == 9
     in
-        RemoteData.toMaybe dictionary
-            |> Maybe.withDefault fallback
+        getWords dictionary
             |> Dict.filter predicate
 
 
@@ -179,16 +170,6 @@ shuffle randoms letters =
             List.sortBy first zipped
     in
         List.unzip sorted |> second
-
-
-stringToLetterList : String -> List Letter
-stringToLetterList str =
-    case String.uncons str of
-        Nothing ->
-            []
-
-        Just ( head, tail ) ->
-            Letter (Char.toLower head) False :: stringToLetterList tail
 
 
 findUnselectedLetter : List Letter -> Char -> Maybe Int

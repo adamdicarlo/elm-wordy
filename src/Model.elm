@@ -1,8 +1,10 @@
 module Model exposing (..)
 
+import Dict
 import Http
 import RemoteData exposing (..)
 import Letter exposing (..)
+import List.Extra exposing (remove)
 import Dictionary exposing (Dictionary, DictionaryResponse, decodeDictionary)
 
 
@@ -16,6 +18,7 @@ type alias GameModel =
     , letters : List Letter
     , reverseGuess : List ( Char, Int )
     , foundWords : List String
+    , totalWords : Int
     }
 
 
@@ -54,9 +57,15 @@ init =
         , letters = []
         , reverseGuess = []
         , foundWords = []
+        , totalWords = 0
         }
     }
         ! [ getDictionary ]
+
+
+fallbackWord : String
+fallbackWord =
+    "flowering"
 
 
 getDictionary : Cmd Msg
@@ -66,8 +75,67 @@ getDictionary =
         |> Cmd.map DictionaryResponse
 
 
+getWords : WebData Dictionary -> Dictionary
+getWords dictionary =
+    let
+        fallback : Dictionary
+        fallback =
+            Dict.singleton fallbackWord ()
+    in
+        RemoteData.toMaybe dictionary
+            |> Maybe.withDefault fallback
+
+
 guessToString : List ( Char, Int ) -> String
 guessToString cs =
     List.map (\t -> Tuple.first t) cs
         |> String.fromList
         |> String.reverse
+
+
+isWordInBoard : String -> List Char -> Bool
+isWordInBoard word boardChars =
+    areCharsInBoard (String.toList word) boardChars
+
+
+areCharsInBoard : List Char -> List Char -> Bool
+areCharsInBoard word boardChars =
+    case word of
+        [] ->
+            True
+
+        ch :: restChars ->
+            let
+                restBoardChars =
+                    remove ch boardChars
+            in
+                -- If we weren't able to remove the current char, it wasn't there, thus the given
+                -- word is not contained in the chars on the board
+                if List.length restBoardChars == List.length boardChars then
+                    False
+                else
+                    areCharsInBoard restChars restBoardChars
+
+
+lettersToCharList : List Letter -> List Char
+lettersToCharList letters =
+    List.map (\(Letter char _) -> char) letters
+
+
+stringToLetterList : String -> List Letter
+stringToLetterList =
+    String.foldr (\char accum -> Letter char False :: accum) []
+
+
+totalWords : WebData Dictionary -> List Letter -> Int
+totalWords dictionary letters =
+    let
+        charList =
+            lettersToCharList letters
+
+        predicate word _ =
+            isWordInBoard word charList
+    in
+        getWords dictionary
+            |> Dict.filter predicate
+            |> Dict.size

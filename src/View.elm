@@ -4,9 +4,9 @@ import Html exposing (Html, div, h1, h2, text)
 import Html.Attributes exposing (attribute, class)
 import Html.Events exposing (onClick)
 import List.Extra
-import RemoteData
+import RemoteData exposing (WebData)
 import Letter exposing (..)
-import Model exposing (..)
+import Model exposing (GameModel, Model, Msg(..), guessToString)
 import UI exposing (button, largeButton, letterButton, selectedLetterButton)
 
 
@@ -51,6 +51,10 @@ viewGame game =
             [ button [ onClick Backspace ] [ text "Backspace" ]
             , button [ onClick Shuffle ] [ text "Shuffle" ]
             , button [ onClick SubmitGuess ] [ text "Submit word" ]
+            ]
+        , div []
+            [ div [] [ text (toString (List.length game.foundWords) ++ " found") ]
+            , div [] [ text (toString game.totalWords ++ " total") ]
             ]
         , viewFoundWords game.foundWords
         ]
