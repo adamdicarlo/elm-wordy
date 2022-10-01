@@ -1,11 +1,11 @@
-module Tests exposing (..)
+module Tests exposing (all, dictionary, start, updateModel, withReverseGuess)
 
-import Test exposing (..)
-import Expect
 import Dict
-import RemoteData exposing (WebData)
+import Expect
 import Letter exposing (Letter(..))
-import Model exposing (guessToString, init, isWordInBoard, stringToLetterList, totalWords, GameModel, Model, Msg(..))
+import Model exposing (GameModel, Model, Msg(..), guessToString, init, isWordInBoard, stringToLetterList, totalWords)
+import RemoteData exposing (WebData)
+import Test exposing (..)
 import Update exposing (update)
 
 
@@ -37,12 +37,12 @@ withReverseGuess reverseGuess =
         startGame =
             start.game
     in
-        { start
-            | game =
-                { startGame
-                    | reverseGuess = reverseGuess
-                }
-        }
+    { start
+        | game =
+            { startGame
+                | reverseGuess = reverseGuess
+            }
+    }
 
 
 all : Test
@@ -109,5 +109,5 @@ all =
                     letters =
                         stringToLetterList "flowering"
                 in
-                    Expect.equal (totalWords dictionary letters) 4
+                Expect.equal (totalWords dictionary letters) 4
         ]

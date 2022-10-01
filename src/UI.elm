@@ -1,87 +1,92 @@
-module UI
-    exposing
-        ( button
-        , largeButton
-        , letterButton
-        , selectedLetterButton
-        )
+module UI exposing
+    ( button
+    , largeButton
+    , letterButton
+    , selectedLetterButton
+    )
 
-import Html exposing (Html, Attribute, a)
-import Styled exposing (..)
-import Styled.Colors exposing (black, pink, white)
-import Styled.Cursors exposing (pointer)
-import Styled.Selectors exposing (active, hover)
-import Styled.Types
+import Element exposing (Element)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
+import Html.Attributes
 
 
-buttonCommon : Styled.Types.Rule
-buttonCommon =
-    mixin
-        [ unselectable
-        , backgroundColor pink
-        , color white
-        , cursor pointer
-        , margin (Styled.em 0.5)
-        , padding2 (Styled.em 0.25) (Styled.em 1)
-        , border (px 2) solid pink
-        , borderRadius (px 4)
-        , active
-            [ boxShadow (px 0) (px 0) (px 0) (px -8) transparent ]
-        , hover
-            [ boxShadow (px 0) (px 0) (px 8) (px -3) black ]
-        ]
-
-
-button : List (Attribute msg) -> List (Html msg) -> Html msg
-button =
-    styled Html.a
-        [ buttonCommon
-        , fontSize (Styled.em 1)
-        ]
-
-
-largeButton : List (Attribute msg) -> List (Html msg) -> Html msg
-largeButton =
-    styled Html.a
-        [ buttonCommon
-        , fontSize (Styled.em 1.5)
-        ]
-
-
-letterCommon : Styled.Types.Rule
-letterCommon =
-    mixin
-        [ unselectable
-        , cursor pointer
-        , borderRadius (px 12)
-        , display inlineFlex
-        , fontSize (Styled.em 4)
-        , fontWeight (int 700)
-        , justifyContent center
-        , lineHeight (px 96)
-        , margin (px 4)
-        , width (px 96)
-        ]
-
-
-letterButton : List (Attribute msg) -> List (Html msg) -> Html msg
-letterButton =
-    styled Html.a
-        [ letterCommon
-        , backgroundColor white
-        , color pink
-        ]
-
-
-selectedLetterButton : List (Attribute msg) -> List (Html msg) -> Html msg
-selectedLetterButton =
-    styled Html.a
-        [ letterCommon
-        , backgroundColor pink
-        , color white
-        ]
-
-
-unselectable : Styled.Types.Rule
+unselectable : Element.Attribute msg
 unselectable =
-    mixin [ declaration "user-select" [ "none" ] ]
+    Element.htmlAttribute (Html.Attributes.attribute "user-select" "none")
+
+
+buttonCommon : List (Element.Attribute msg)
+buttonCommon =
+    [ unselectable
+    , Background.color pink
+    , Font.color white
+    , Element.pointer
+    , Element.paddingXY 8 8
+    , Border.color pink
+    , Border.rounded 4
+    ]
+
+
+transparent : Element.Color
+transparent =
+    Element.rgba255 0 0 0 0
+
+
+black : Element.Color
+black =
+    Element.rgb255 0 0 0
+
+
+white : Element.Color
+white =
+    Element.rgb255 255 255 255
+
+
+pink : Element.Color
+pink =
+    Element.rgb255 255 80 80
+
+
+button : List (Element.Attribute msg) -> Element msg -> Element msg
+button attrs =
+    Element.el (buttonCommon ++ attrs)
+
+
+largeButton : List (Element.Attribute msg) -> Element msg -> Element msg
+largeButton attrs =
+    Element.el (buttonCommon ++ attrs)
+
+
+letterCommon : List (Element.Attribute msg)
+letterCommon =
+    -- line height is handled by element.spacing
+    [ Element.pointer
+    , Border.rounded 12
+    , Font.size 30
+    , Font.bold
+    , Element.centerX
+    , Element.paddingXY 8 4
+    , Element.width (Element.px 96)
+    ]
+
+
+letterButton : List (Element.Attribute msg) -> Element msg -> Element msg
+letterButton attrs =
+    [ letterCommon
+    , [ Background.color white, Font.color pink ]
+    , attrs
+    ]
+        |> List.concat
+        |> Element.el
+
+
+selectedLetterButton : List (Element.Attribute msg) -> Element msg -> Element msg
+selectedLetterButton attrs =
+    [ letterCommon
+    , [ Background.color pink, Font.color white ]
+    , attrs
+    ]
+        |> List.concat
+        |> Element.el

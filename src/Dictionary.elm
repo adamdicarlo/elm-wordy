@@ -1,10 +1,9 @@
-module Dictionary
-    exposing
-        ( Dictionary
-        , DictionaryResponse
-        , decodeDictionary
-        , dictionaryFromResponse
-        )
+module Dictionary exposing
+    ( Dictionary
+    , DictionaryResponse
+    , decodeDictionary
+    , dictionaryFromResponse
+    )
 
 import Dict exposing (Dict)
 import Json.Decode
@@ -22,7 +21,7 @@ type alias DictionaryResponse =
 
 decodeDictionary : Json.Decode.Decoder DictionaryResponse
 decodeDictionary =
-    Json.Decode.Pipeline.decode DictionaryResponse
+    Json.Decode.succeed DictionaryResponse
         |> Json.Decode.Pipeline.required "dictionary" (Json.Decode.list Json.Decode.string)
 
 

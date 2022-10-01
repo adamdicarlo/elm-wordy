@@ -2,26 +2,23 @@
   "name": "elm-wordy",
   "version": "1.0.0",
   "description": "\"Worder\"-like game written in Elm",
-  "main": "src/index.js",
   "repository": "https://github.com/adamdicarlo/elm-wordy.git",
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "postinstall": "elm-install",
-    "start": "scripts/generate-dictionary-json.js && elm-app start",
-    "build": "elm-app build && scripts/generate-dictionary-json.js && mv dictionary.json dist/",
-    "lint": "elm-analyse",
-    "test": "elm-app test"
+    "start": "scripts/generate-dictionary-json.js && parcel serve ./src/index.html",
+    "build": "parcel build ./src/index.html",
+    "dev": "parcel ./src/index.html"
   },
-  "dependencies": {
-    "create-elm-app": "^0.8.6",
-    "elm-github-install": "^1.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "elm-analyse": "^0.7.0",
-    "split2": "^2.1.1",
-    "through2": "^2.0.3",
-    "through2-filter": "^2.0.0",
+    "@parcel/transformer-elm": "2.7.0",
+    "elm": "^0.19.1-5",
+    "elm-test": "0.19.1-revision9",
+    "parcel": "^2.7.0",
+    "split2": "^4.1.0",
+    "through2": "^4.0.2",
+    "through2-filter": "^3.0.0",
     "through2-map": "^3.0.0"
   }
 }

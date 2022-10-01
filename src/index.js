@@ -1,3 +1,3 @@
-require('./main.css')
-var Elm = require('./Main.elm')
-Elm.Main.embed(document.getElementById('root'))
+import "./main.css";
+import { Elm } from "./Main.elm";
+Elm.Main.init();
