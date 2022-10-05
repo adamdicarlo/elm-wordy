@@ -506,8 +506,10 @@ viewMenu model =
                     Element.paragraph [] [ Element.text ("Error: " ++ httpErrorToString err) ]
 
                 RemoteData.Success _ ->
-                    Element.text "New Game"
-                        |> UI.largeButton [ Events.onClick NewGame ]
+                    UI.largeButton []
+                        { label = Element.text "New Game"
+                        , onPress = Just NewGame
+                        }
     in
     Element.column []
         [ Element.el [ Region.heading 1 ] (Element.text "Wordy")
@@ -516,6 +518,7 @@ viewMenu model =
         |> Element.layout []
 
 
+htmlClass : String -> Element.Attribute Msg
 htmlClass =
     Element.htmlAttribute << Html.Attributes.class
 
@@ -531,9 +534,9 @@ viewGame game =
                 |> Element.text
             )
         , Element.row [ htmlClass "primaryButtons" ]
-            [ UI.button [ Events.onClick Backspace ] (Element.text "Backspace")
-            , UI.button [ Events.onClick Shuffle ] (Element.text "Shuffle")
-            , UI.button [ Events.onClick SubmitGuess ] (Element.text "Submit word")
+            [ UI.button [] { label = Element.text "Backspace", onPress = Just Backspace }
+            , UI.button [] { label = Element.text "Shuffle", onPress = Just Shuffle }
+            , UI.button [] { label = Element.text "Submit word", onPress = Just SubmitGuess }
             ]
         , [ List.length game.foundWords |> String.fromInt, " found" ]
             |> String.concat
@@ -565,14 +568,14 @@ viewLetters letters =
 viewLetter : Int -> Letter -> Element Msg
 viewLetter index (Letter ch selected) =
     let
-        element =
-            if selected then
-                UI.selectedLetterButton []
-
-            else
-                UI.letterButton [ Events.onClick (AddLetter ch index) ]
+        label =
+            ch |> String.fromChar |> String.toUpper |> Element.text
     in
-    element (ch |> String.fromChar |> String.toUpper |> Element.text)
+    if selected then
+        UI.selectedLetterButton [] { label = label, onPress = Nothing }
+
+    else
+        UI.letterButton [] { label = label, onPress = Just (AddLetter ch index) }
 
 
 viewFoundWords : List String -> Element Msg

@@ -9,6 +9,7 @@ import Element exposing (Element)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Html.Attributes
 
 
@@ -49,14 +50,14 @@ pink =
     Element.rgb255 255 80 80
 
 
-button : List (Element.Attribute msg) -> Element msg -> Element msg
+button : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 button attrs =
-    Element.el (buttonCommon ++ attrs)
+    Input.button (buttonCommon ++ attrs)
 
 
-largeButton : List (Element.Attribute msg) -> Element msg -> Element msg
+largeButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 largeButton attrs =
-    Element.el (buttonCommon ++ attrs)
+    Input.button (buttonCommon ++ attrs)
 
 
 letterCommon : List (Element.Attribute msg)
@@ -72,21 +73,21 @@ letterCommon =
     ]
 
 
-letterButton : List (Element.Attribute msg) -> Element msg -> Element msg
+letterButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 letterButton attrs =
     [ letterCommon
     , [ Background.color white, Font.color pink ]
     , attrs
     ]
         |> List.concat
-        |> Element.el
+        |> Input.button
 
 
-selectedLetterButton : List (Element.Attribute msg) -> Element msg -> Element msg
+selectedLetterButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 selectedLetterButton attrs =
     [ letterCommon
     , [ Background.color pink, Font.color white ]
     , attrs
     ]
         |> List.concat
-        |> Element.el
+        |> Input.button
