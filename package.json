@@ -13,8 +13,8 @@
   "dependencies": {},
   "devDependencies": {
     "@parcel/transformer-elm": "2.7.0",
-    "elm": "^0.19.1-5",
     "elm-test": "0.19.1-revision9",
+    "elm-tooling": "^1.8.0",
     "parcel": "^2.7.0",
     "split2": "^4.1.0",
     "through2": "^4.0.2",
