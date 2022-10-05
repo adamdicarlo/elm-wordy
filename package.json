@@ -6,6 +6,7 @@
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
+    "postinstall": "elm-tooling install",
     "start": "scripts/generate-dictionary-json.js && parcel serve ./src/index.html",
     "build": "parcel build ./src/index.html",
     "dev": "parcel ./src/index.html"
