@@ -509,7 +509,10 @@ viewMenu model =
                         , onPress = Just NewGame
                         }
     in
-    Element.column []
+    Element.column
+        [ Element.centerX
+        , Element.centerY
+        ]
         [ Element.el [ Region.heading 1 ] (Element.text "Wordy")
         , content
         ]
@@ -523,15 +526,25 @@ htmlClass =
 
 viewGame : GameModel -> Html Msg
 viewGame game =
-    Element.column []
-        [ Element.el [ Region.heading 1 ] (Element.text "Wordy")
+    Element.column
+        [ Element.centerX
+        , Element.centerY
+        , Element.spacing 8
+        ]
+        [ Element.el
+            [ Region.heading 1
+            ]
+            (Element.text "Wordy")
         , viewLetters game.letters
         , Element.el [ htmlClass "guess" ]
             (guessToString game.reverseGuess
                 |> String.toUpper
                 |> Element.text
             )
-        , Element.row [ htmlClass "primaryButtons" ]
+        , Element.row
+            [ htmlClass "primaryButtons"
+            , Element.spacing 16
+            ]
             [ UI.button [] { label = Element.text "Backspace", onPress = Just Backspace }
             , UI.button [] { label = Element.text "Shuffle", onPress = Just Shuffle }
             , UI.button [] { label = Element.text "Submit word", onPress = Just SubmitGuess }
@@ -555,9 +568,15 @@ viewLetters letters =
     in
     -- Wrap each group (3 letters) into a row
     rows
-        |> List.map (Element.row [ htmlClass "letterRow" ])
+        |> List.map
+            (Element.row
+                [ Element.spacing 16
+                , htmlClass "letterRow"
+                ]
+            )
         |> Element.column
             [ htmlClass "letterGrid"
+            , Element.spacing 16
             , Element.htmlAttribute
                 (Html.Attributes.attribute "unselectable" "on")
             ]

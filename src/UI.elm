@@ -65,11 +65,10 @@ letterCommon =
     -- line height is handled by element.spacing
     [ Element.pointer
     , Border.rounded 12
-    , Font.size 30
+    , Font.center
+    , Font.size 36
     , Font.bold
-    , Element.centerX
-    , Element.paddingXY 8 4
-    , Element.width (Element.px 96)
+    , Element.paddingXY 32 26
     ]
 
 
