@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events exposing (onKeyDown)
-import Char
 import Dict
 import Dictionary
     exposing
@@ -12,7 +11,6 @@ import Dictionary
         , dictionaryFromResponse
         )
 import Element exposing (Element)
-import Element.Events as Events
 import Element.Region as Region
 import Html exposing (Html)
 import Html.Attributes
