@@ -70,6 +70,8 @@ type alias Model =
     }
 
 
+{-| TODO: Rename msgs to indicate action source (e.g., UserClickedBackspace)
+-}
 type Msg
     = -- User action: Adds the letter (Char) from a position (Int) to the guess
       AddLetter Char Int

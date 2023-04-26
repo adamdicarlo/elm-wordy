@@ -6,8 +6,8 @@ module Dictionary exposing
     )
 
 import Dict exposing (Dict)
-import Json.Decode
-import Json.Decode.Pipeline
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline as Decode
 
 
 type alias Dictionary =
@@ -19,10 +19,10 @@ type alias DictionaryResponse =
     }
 
 
-decodeDictionary : Json.Decode.Decoder DictionaryResponse
+decodeDictionary : Decoder DictionaryResponse
 decodeDictionary =
-    Json.Decode.succeed DictionaryResponse
-        |> Json.Decode.Pipeline.required "dictionary" (Json.Decode.list Json.Decode.string)
+    Decode.succeed DictionaryResponse
+        |> Decode.required "dictionary" (Decode.list Decode.string)
 
 
 dictionaryFromResponse : List String -> Dictionary
