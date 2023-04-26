@@ -11,6 +11,7 @@ import Dictionary
         , dictionaryFromResponse
         )
 import Element exposing (Element)
+import Element.Font as Font
 import Element.Region as Region
 import Html exposing (Html)
 import Html.Attributes
@@ -508,12 +509,19 @@ viewMenu model =
                         { label = Element.text "New Game"
                         , onPress = Just NewGame
                         }
+                        |> Element.el [ Element.centerX ]
     in
     Element.column
         [ Element.centerX
         , Element.centerY
+        , Element.spacing 64
         ]
-        [ Element.el [ Region.heading 1 ] (Element.text "Wordy")
+        [ Element.el
+            [ Region.heading 1
+            , Font.bold
+            , Font.size 72
+            ]
+            (Element.text "Wordy")
         , content
         ]
         |> Element.layout []
@@ -529,33 +537,67 @@ viewGame game =
     Element.column
         [ Element.centerX
         , Element.centerY
-        , Element.spacing 8
+        , Element.spacing 16
+        , Element.height Element.fill
         ]
         [ Element.el
             [ Region.heading 1
+            , Element.centerX
+            , Font.bold
+            , Font.size 24
             ]
             (Element.text "Wordy")
         , viewLetters game.letters
-        , Element.el [ htmlClass "guess" ]
+        , Element.el
+            [ htmlClass "guess"
+            , Element.centerX
+            , Font.family [ Font.monospace ]
+            , Font.bold
+            , Font.size 24
+            ]
             (guessToString game.reverseGuess
                 |> String.toUpper
+                -- Hack: Always render at least a space, in order to reserve vertical space.
+                |> String.append " "
                 |> Element.text
             )
         , Element.row
             [ htmlClass "primaryButtons"
             , Element.spacing 16
+            , Element.alignRight
             ]
-            [ UI.button [] { label = Element.text "Backspace", onPress = Just Backspace }
-            , UI.button [] { label = Element.text "Shuffle", onPress = Just Shuffle }
-            , UI.button [] { label = Element.text "Submit word", onPress = Just SubmitGuess }
+            [ UI.button []
+                { label = Element.text "Backspace"
+                , onPress = Just Backspace
+                }
+            , UI.button []
+                { label = Element.text "Shuffle"
+                , onPress = Just Shuffle
+                }
+            , UI.button []
+                { label = Element.text "Submit word"
+                , onPress = Just SubmitGuess
+                }
             ]
-        , [ List.length game.foundWords |> String.fromInt, " found" ]
-            |> String.concat
-            |> Element.text
-        , Element.text (String.fromInt game.totalWords ++ " total")
-        , viewFoundWords game.foundWords
+        , Element.row
+            []
+            [ [ List.length game.foundWords |> String.fromInt
+              , " of "
+              , String.fromInt game.totalWords
+              , " found"
+              ]
+                |> String.concat
+                |> Element.text
+            ]
+        , Element.el
+            [ Element.scrollbarY
+            , Element.height Element.fill
+            , Element.width Element.fill
+            ]
+            (viewFoundWords game.foundWords)
         ]
-        |> Element.layout []
+        |> Element.layout
+            [ Element.paddingXY 0 32 ]
 
 
 viewLetters : List Letter -> Element Msg
@@ -602,4 +644,9 @@ viewFoundWords foundWords =
             foundWords
                 |> List.map (\w -> Element.el [] (String.toUpper w |> Element.text))
     in
-    Element.column [ htmlClass "foundWords" ] children
+    Element.column
+        [ htmlClass "foundWords"
+        , Font.family [ Font.monospace ]
+        , Font.size 18
+        ]
+        children

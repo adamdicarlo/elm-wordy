@@ -66,9 +66,10 @@ letterCommon =
     [ Element.pointer
     , Border.rounded 12
     , Font.center
-    , Font.size 36
+    , Font.size 54
     , Font.bold
-    , Element.paddingXY 32 26
+    , Element.width (Element.px 120)
+    , Element.height (Element.px 120)
     ]
 
 
