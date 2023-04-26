@@ -9,6 +9,7 @@
     "postinstall": "elm-tooling install",
     "start": "scripts/generate-dictionary-json.js && parcel serve ./src/index.html",
     "build": "parcel build ./src/index.html",
+    "postbuild": "scripts/generate-dictionary-json.js",
     "dev": "parcel ./src/index.html"
   },
   "dependencies": {},
