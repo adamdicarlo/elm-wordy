@@ -15,9 +15,11 @@
       "elm/time": "1.0.0",
       "elm-community/list-extra": "8.6.0",
       "krisajenkins/remotedata": "5.0.0",
-      "mdgriffith/elm-ui": "1.1.8"
+      "mdgriffith/elm-ui": "1.1.8",
+      "phosphor-icons/phosphor-elm": "2.0.0"
     },
     "indirect": {
+      "elm/svg": "1.0.1",
       "elm/url": "1.0.0",
       "elm/virtual-dom": "1.0.3"
     }
