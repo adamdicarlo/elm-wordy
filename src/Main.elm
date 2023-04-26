@@ -115,7 +115,7 @@ fallbackWord =
 
 getDictionary : Cmd Msg
 getDictionary =
-    Http.get "/dictionary.json" decodeDictionary
+    Http.get "dictionary.json" decodeDictionary
         |> RemoteData.sendRequest
         |> Cmd.map DictionaryResponse
 
