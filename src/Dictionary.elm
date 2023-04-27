@@ -1,7 +1,7 @@
 module Dictionary exposing
     ( Dictionary
     , DictionaryResponse
-    , decodeDictionary
+    , decode
     , dictionaryFromResponse
     )
 
@@ -19,8 +19,8 @@ type alias DictionaryResponse =
     }
 
 
-decodeDictionary : Decoder DictionaryResponse
-decodeDictionary =
+decode : Decoder DictionaryResponse
+decode =
     Decode.succeed DictionaryResponse
         |> Decode.required "dictionary" (Decode.list Decode.string)
 

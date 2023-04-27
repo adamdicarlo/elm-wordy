@@ -13,31 +13,3 @@ html, body {
   background: #F0F0F0;
   font-family: sans-serif;
 }
-
-main {
-  display: flex;
-  justify-content: center;
-  margin-top: 60px;
-}
-
-.guess {
-  line-height: 1;
-  height: 1em;
-  margin: 0.5em 0;
-}
-
-.selected {
-  background-color: red;
-  color: white;
-  cursor: default;
-}
-
-.primaryButtons {
-  display: flex;
-  justify-content: space-between;
-}
-
-.foundWords {
-  list-style-type: none;
-  font-size: 24px;
-}

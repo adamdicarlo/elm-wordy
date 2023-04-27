@@ -7,7 +7,6 @@ import Dictionary
     exposing
         ( Dictionary
         , DictionaryResponse
-        , decodeDictionary
         , dictionaryFromResponse
         )
 import Element exposing (Element)
@@ -21,7 +20,7 @@ import List.Extra as List
 import Phosphor
 import Random exposing (Generator)
 import RemoteData exposing (WebData)
-import Tuple exposing (first, second)
+import Tuple
 import UI
 
 
@@ -116,7 +115,7 @@ fallbackWord =
 
 getDictionary : Cmd Msg
 getDictionary =
-    Http.get "dictionary.json" decodeDictionary
+    Http.get "dictionary.json" Dictionary.decode
         |> RemoteData.sendRequest
         |> Cmd.map DictionaryResponse
 
@@ -360,9 +359,9 @@ shuffle randoms letters =
             List.map2 (\a b -> ( a, b )) randoms letters
 
         sorted =
-            List.sortBy first zipped
+            List.sortBy Tuple.first zipped
     in
-    List.unzip sorted |> second
+    List.unzip sorted |> Tuple.second
 
 
 findUnselectedLetter : List Letter -> Char -> Maybe Int
@@ -530,11 +529,6 @@ viewMenu model =
         |> Element.layout []
 
 
-htmlClass : String -> Element.Attribute Msg
-htmlClass =
-    Element.htmlAttribute << Html.Attributes.class
-
-
 viewIcon : (Phosphor.IconWeight -> Phosphor.IconVariant) -> Element Msg
 viewIcon icon =
     icon Phosphor.Regular
@@ -573,8 +567,7 @@ viewGame game =
             ]
         , viewLetters game.letters
         , Element.el
-            [ htmlClass "guess"
-            , Element.centerX
+            [ Element.centerX
             , Font.family [ Font.monospace ]
             , Font.bold
             , Font.size 24
@@ -586,8 +579,7 @@ viewGame game =
                 |> Element.text
             )
         , Element.row
-            [ htmlClass "primaryButtons"
-            , Element.spaceEvenly
+            [ Element.spaceEvenly
             , Element.width Element.fill
             ]
             [ UI.button []
@@ -631,12 +623,10 @@ viewLetters letters =
         |> List.map
             (Element.row
                 [ Element.spacing 16
-                , htmlClass "letterRow"
                 ]
             )
         |> Element.column
-            [ htmlClass "letterGrid"
-            , Element.spacing 16
+            [ Element.spacing 16
             , Element.htmlAttribute
                 (Html.Attributes.attribute "unselectable" "on")
             ]
@@ -663,8 +653,6 @@ viewFoundWords foundWords =
                 |> List.map (\w -> Element.el [] (String.toUpper w |> Element.text))
     in
     Element.column
-        [ htmlClass "foundWords"
-        , Font.family [ Font.monospace ]
-        , Font.size 18
+        [ Font.family [ Font.monospace ]
         ]
         children
