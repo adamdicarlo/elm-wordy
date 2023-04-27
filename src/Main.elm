@@ -507,23 +507,34 @@ viewMenu model =
                     Element.paragraph [] [ Element.text ("Error: " ++ httpErrorToString err) ]
 
                 RemoteData.Success _ ->
-                    UI.largeButton []
-                        { label = Element.text "Play"
-                        , onPress = Just NewGame
-                        }
-                        |> Element.el [ Element.centerX ]
+                    Element.column
+                        [ Element.spacing 40
+                        ]
+                        [ UI.largeButton []
+                            { label = Element.text "Play"
+                            , onPress = Just NewGame
+                            }
+                            |> Element.el [ Element.centerX ]
+                        , Element.row []
+                            [ Element.paragraph [ Element.paddingXY 32 0 ]
+                                [ Element.text "How many words can you find? Words must be at least three letters."
+                                ]
+                            ]
+                        ]
     in
     Element.column
         [ Element.centerX
         , Element.centerY
         , Element.spacing 64
         ]
-        [ Element.el
-            [ Region.heading 1
-            , Font.bold
-            , Font.size 72
+        [ Element.row [ Element.centerX ]
+            [ Element.el
+                [ Region.heading 1
+                , Font.bold
+                , Font.size 72
+                ]
+                (Element.text "Wordy")
             ]
-            (Element.text "Wordy")
         , content
         ]
         |> Element.layout []
@@ -563,7 +574,7 @@ viewGame game =
               ]
                 |> String.concat
                 |> Element.text
-                |> Element.el []
+                |> Element.el [ Font.size 20 ]
             ]
         , viewLetters game.letters
         , Element.el
@@ -654,5 +665,6 @@ viewFoundWords foundWords =
     in
     Element.column
         [ Font.family [ Font.monospace ]
+        , Font.size 20
         ]
         children
