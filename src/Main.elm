@@ -18,6 +18,7 @@ import Html.Attributes
 import Http
 import Json.Decode as Decode
 import List.Extra as List
+import Phosphor
 import Random exposing (Generator)
 import RemoteData exposing (WebData)
 import Tuple exposing (first, second)
@@ -508,7 +509,7 @@ viewMenu model =
 
                 RemoteData.Success _ ->
                     UI.largeButton []
-                        { label = Element.text "New Game"
+                        { label = Element.text "Play"
                         , onPress = Just NewGame
                         }
                         |> Element.el [ Element.centerX ]
@@ -534,6 +535,15 @@ htmlClass =
     Element.htmlAttribute << Html.Attributes.class
 
 
+viewIcon : (Phosphor.IconWeight -> Phosphor.IconVariant) -> Element Msg
+viewIcon icon =
+    icon Phosphor.Regular
+        |> Phosphor.withSize 32
+        |> Phosphor.withSizeUnit "px"
+        |> Phosphor.toHtml []
+        |> Element.html
+
+
 viewGame : GameModel -> Html Msg
 viewGame game =
     Element.column
@@ -542,13 +552,25 @@ viewGame game =
         , Element.spacing 16
         , Element.height Element.fill
         ]
-        [ Element.el
-            [ Region.heading 1
-            , Element.centerX
-            , Font.bold
-            , Font.size 24
+        [ Element.row
+            [ Element.width Element.fill
+            , Element.spaceEvenly
             ]
-            (Element.text "Wordy")
+            [ Element.el
+                [ Region.heading 1
+                , Font.bold
+                , Font.size 20
+                ]
+                (Element.text "Wordy")
+            , [ List.length game.foundWords |> String.fromInt
+              , " of "
+              , String.fromInt game.totalWords
+              , " found"
+              ]
+                |> String.concat
+                |> Element.text
+                |> Element.el []
+            ]
         , viewLetters game.letters
         , Element.el
             [ htmlClass "guess"
@@ -565,31 +587,25 @@ viewGame game =
             )
         , Element.row
             [ htmlClass "primaryButtons"
-            , Element.spacing 16
-            , Element.alignRight
+            , Element.spaceEvenly
+            , Element.width Element.fill
             ]
             [ UI.button []
-                { label = Element.text "Backspace"
-                , onPress = Just Backspace
-                }
-            , UI.button []
-                { label = Element.text "Shuffle"
+                { label = viewIcon Phosphor.shuffle
                 , onPress = Just Shuffle
                 }
-            , UI.button []
-                { label = Element.text "Submit word"
-                , onPress = Just SubmitGuess
-                }
-            ]
-        , Element.row
-            []
-            [ [ List.length game.foundWords |> String.fromInt
-              , " of "
-              , String.fromInt game.totalWords
-              , " found"
-              ]
-                |> String.concat
-                |> Element.text
+            , Element.row
+                [ Element.spacing 16
+                ]
+                [ UI.button []
+                    { label = viewIcon Phosphor.backspace
+                    , onPress = Just Backspace
+                    }
+                , UI.button []
+                    { label = viewIcon Phosphor.keyReturn
+                    , onPress = Just SubmitGuess
+                    }
+                ]
             ]
         , Element.el
             [ Element.scrollbarY

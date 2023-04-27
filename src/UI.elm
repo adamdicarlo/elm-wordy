@@ -18,18 +18,6 @@ unselectable =
     Element.htmlAttribute (Html.Attributes.attribute "user-select" "none")
 
 
-buttonCommon : List (Element.Attribute msg)
-buttonCommon =
-    [ unselectable
-    , Background.color pink
-    , Font.color white
-    , Element.pointer
-    , Element.paddingXY 8 8
-    , Border.color pink
-    , Border.rounded 4
-    ]
-
-
 transparent : Element.Color
 transparent =
     Element.rgba255 0 0 0 0
@@ -52,24 +40,43 @@ pink =
 
 button : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 button attrs =
-    Input.button (buttonCommon ++ attrs)
+    [ unselectable
+    , Background.color pink
+    , Font.color white
+    , Element.pointer
+    , Element.paddingXY 8 8
+    , Border.color pink
+    , Border.rounded 4
+    ]
+        ++ attrs
+        |> Input.button
 
 
 largeButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 largeButton attrs =
-    Input.button (buttonCommon ++ attrs)
+    [ unselectable
+    , Background.color pink
+    , Font.color white
+    , Font.size 30
+    , Element.pointer
+    , Element.paddingXY 20 12
+    , Border.color pink
+    , Border.rounded 4
+    ]
+        ++ attrs
+        |> Input.button
 
 
 letterCommon : List (Element.Attribute msg)
 letterCommon =
     -- line height is handled by element.spacing
     [ Element.pointer
+    , Element.width (Element.px 100)
+    , Element.height (Element.px 100)
     , Border.rounded 12
-    , Font.center
-    , Font.size 54
     , Font.bold
-    , Element.width (Element.px 120)
-    , Element.height (Element.px 120)
+    , Font.center
+    , Font.size 48
     ]
 
 
