@@ -1,0 +1,10 @@
+{
+    "targets": {
+        "wordy": {
+            "inputs": [
+                "src/Main.elm"
+            ],
+            "output": "build/main.js"
+        }
+    }
+}

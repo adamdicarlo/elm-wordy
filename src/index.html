@@ -4,9 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Wordy</title>
+  <style>
+    /**
+     * Universal box-sizing with inheritance.
+     * See https://css-tricks.com/box-sizing/#article-header-id-6
+     */
+    html {
+      box-sizing: border-box;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    html, body {
+      background: #EEE;
+      font-family: sans-serif;
+    }
+  </style>
 </head>
 <body>
   <main id="root"></main>
-  <script type="module" src="./index.js"></script>
+  <script src="main.js"></script>
+  <script>Elm.Main.init({ node: document.getElementById('root') })</script>
 </body>
 </html>

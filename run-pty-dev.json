@@ -1,0 +1,49 @@
+[
+  {
+    "command": ["elm-watch", "hot"],
+    "title": "elm-watch",
+    "status": {
+      "⏳": ["⏳", "W"],
+      "🚨": ["🚨", "E"],
+      "✅": ["✅", "+"]
+    },
+    "defaultStatus": ["⏳", "W"]
+  },
+  {
+    "command": ["st", "-p", "2345", "-nc", "-d", "build"],
+    "title": "serve",
+    "status": {
+      "listening at http.*:2345": ["✅", "+"],
+      "ERROR": ["🚨", "E"],
+      "200": null
+    }
+  },
+  {
+    "command": [
+      "nodemon",
+      "-w",
+      "src/index.html",
+      "-x",
+      "cp src/index.html build/"
+    ],
+    "title": "watch index.html",
+    "status": {
+      "Error": ["🚨", "E"],
+      "\\[nodemon\\] clean exit": ["✅", "+"]
+    }
+  },
+  {
+    "command": [
+      "nodemon",
+      "-w",
+      "vendor/dolph/dictionary/popular.txt",
+      "scripts/generate-dictionary-json.js"
+    ],
+    "title": "watch dictionary",
+    "status": {
+      "Error": ["🚨", "E"],
+      "process failed": ["🚨", "E"],
+      "\\[nodemon\\] clean exit": ["✅", "+"]
+    }
+  }
+]

@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 
-const fs = require("fs")
-const path = require("path")
-const split = require("split2")
-const filter = require("through2-filter")
-const map = require("through2-map")
-const through = require("through2")
+import { createReadStream, createWriteStream } from "fs"
+import split from "split2"
+import filter from "through2-filter"
+import map from "through2-map"
+import through from "through2"
 
-fs.createReadStream(
-    path.resolve(__dirname, "../vendor/dolph/dictionary/popular.txt")
+const source = new URL(
+    "../vendor/dolph/dictionary/popular.txt",
+    import.meta.url
 )
+const target = new URL("../build/dictionary.json", import.meta.url)
+
+createReadStream(source)
     .pipe(split())
     .pipe(
         filter({ wantStrings: true }, (rawWord) => {
@@ -29,9 +32,7 @@ fs.createReadStream(
             flush()
         })
     )
-    .pipe(
-        fs.createWriteStream(path.resolve(__dirname, "../dist/dictionary.json"))
-    )
+    .pipe(createWriteStream(target))
     .on("finish", () => {
         console.log("dictionary.json generated")
     })
