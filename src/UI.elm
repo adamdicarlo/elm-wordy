@@ -3,6 +3,7 @@ module UI exposing
     , largeButton
     , letterButton
     , selectedLetterButton
+    , white
     )
 
 import Element exposing (Element)
@@ -18,14 +19,16 @@ unselectable =
     Element.htmlAttribute (Html.Attributes.attribute "user-select" "none")
 
 
-transparent : Element.Color
-transparent =
-    Element.rgba255 0 0 0 0
-
-
-black : Element.Color
-black =
-    Element.rgb255 0 0 0
+buttonCommon : List (Element.Attribute msg)
+buttonCommon =
+    [ unselectable
+    , Background.color pink
+    , Font.color white
+    , Element.pointer
+    , Element.paddingXY 8 8
+    , Border.color pink
+    , Border.rounded 4
+    ]
 
 
 white : Element.Color
@@ -40,43 +43,50 @@ pink =
 
 button : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 button attrs =
-    [ unselectable
-    , Background.color pink
-    , Font.color white
-    , Element.pointer
-    , Element.paddingXY 8 8
-    , Border.color pink
-    , Border.rounded 4
-    ]
-        ++ attrs
-        |> Input.button
+    Input.button (buttonCommon ++ attrs)
 
 
 largeButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
 largeButton attrs =
-    [ unselectable
-    , Background.color pink
-    , Font.color white
-    , Font.size 30
-    , Element.pointer
-    , Element.paddingXY 20 12
-    , Border.color pink
-    , Border.rounded 4
-    ]
-        ++ attrs
-        |> Input.button
+    Input.button
+        ([ unselectable
+         , Background.color pink
+         , Font.color white
+         , Font.size 48
+         , Font.family [ Font.monospace ]
+         , Element.paddingXY 30 22
+         , Border.color pink
+         , Border.shadow
+            { offset = ( 0, 0 )
+            , size = 1.0
+            , blur = 8.0
+            , color = Element.rgb 0.5 0.5 0.5
+            }
+         , Border.rounded 4
+         , Element.mouseDown
+            [ Border.shadow
+                { offset = ( 0, 0 )
+                , size = 0
+                , blur = 0
+                , color = Element.rgb 0 0 0
+                }
+            ]
+         ]
+            ++ attrs
+        )
 
 
 letterCommon : List (Element.Attribute msg)
 letterCommon =
     -- line height is handled by element.spacing
     [ Element.pointer
+    , Border.rounded 12
+    , Font.center
+    , Font.family [ Font.monospace ]
+    , Font.size 48
+    , Font.bold
     , Element.width (Element.px 100)
     , Element.height (Element.px 100)
-    , Border.rounded 12
-    , Font.bold
-    , Font.center
-    , Font.size 48
     ]
 
 

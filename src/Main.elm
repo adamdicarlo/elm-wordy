@@ -10,6 +10,7 @@ import Dictionary
         , dictionaryFromResponse
         )
 import Element exposing (Element)
+import Element.Background as Background
 import Element.Font as Font
 import Element.Region as Region
 import Html exposing (Html)
@@ -18,8 +19,10 @@ import Http
 import Json.Decode as Decode
 import List.Extra as List
 import Phosphor
+import Process
 import Random exposing (Generator)
 import RemoteData exposing (WebData)
+import Task
 import Tuple
 import UI
 
@@ -55,11 +58,19 @@ type Letter
     = Letter Char Bool
 
 
+type Feedback
+    = AlreadyFound String
+    | Idle
+    | InvalidWord String
+    | WordFound String
+
+
 type alias GameModel =
     { dictionary : WebData Dictionary
+    , feedback : Feedback
+    , foundWords : List String
     , letters : List Letter
     , reverseGuess : List ( Char, Int )
-    , foundWords : List String
     , totalWords : Int
     }
 
@@ -78,7 +89,8 @@ type Msg
       -- User action: Erase last letter of guess
     | Backspace
       -- User action: Submit the guess
-    | SubmitGuess
+    | ClearFeedback
+    | SubmitGuess Dictionary
       -- User action: Shuffle the board
     | Shuffle
       -- User action: Start a new game
@@ -98,9 +110,10 @@ init _ =
     ( { screen = Menu
       , game =
             { dictionary = RemoteData.Loading
+            , feedback = Idle
+            , foundWords = []
             , letters = []
             , reverseGuess = []
-            , foundWords = []
             , totalWords = 0
             }
       }
@@ -245,32 +258,47 @@ update msg ({ game } as model) =
                     , Cmd.none
                     )
 
-        SubmitGuess ->
+        ClearFeedback ->
+            ( { model
+                | game =
+                    { game | feedback = Idle }
+              }
+            , Cmd.none
+            )
+
+        SubmitGuess dictionary ->
             let
                 guess =
                     guessToString game.reverseGuess
 
-                newFoundWords =
-                    case game.dictionary of
-                        RemoteData.Success dictionary ->
-                            if validWord guess dictionary && eligibleWord guess game.foundWords then
-                                guess :: game.foundWords
+                isValid =
+                    validWord guess dictionary
 
-                            else
-                                game.foundWords
+                isAlreadyFound =
+                    not <| eligibleWord guess game.foundWords
 
-                        _ ->
-                            game.foundWords
+                ( newFoundWords, feedback ) =
+                    if isValid then
+                        if isAlreadyFound then
+                            ( game.foundWords, AlreadyFound guess )
+
+                        else
+                            ( guess :: game.foundWords, WordFound guess )
+
+                    else
+                        ( game.foundWords, InvalidWord guess )
             in
             ( { model
                 | game =
                     { game
-                        | reverseGuess = []
-                        , letters = unmarkAll game.letters
+                        | feedback = feedback
                         , foundWords = newFoundWords
+                        , letters = unmarkAll game.letters
+                        , reverseGuess = []
                     }
               }
-            , Cmd.none
+            , Process.sleep 1000
+                |> Task.perform (\_ -> ClearFeedback)
             )
 
         Shuffle ->
@@ -428,16 +456,19 @@ unmarkAll letters =
 keyEventToCmd : Model -> Decode.Decoder Msg
 keyEventToCmd model =
     Decode.field "key" Decode.string
-        |> Decode.map
+        |> Decode.andThen
             (\key ->
                 case key of
                     -- Enter key
                     "Enter" ->
-                        SubmitGuess
+                        model.game.dictionary
+                            |> RemoteData.toMaybe
+                            |> Maybe.map (\dict -> Decode.succeed (SubmitGuess dict))
+                            |> Maybe.withDefault (Decode.fail "SubmitGuess without dictionary")
 
                     -- Backspace key
                     "Backspace" ->
-                        Backspace
+                        Decode.succeed Backspace
 
                     other ->
                         if String.length other == 1 then
@@ -447,15 +478,16 @@ keyEventToCmd model =
                                     (\( ch, _ ) ->
                                         case findUnselectedLetter model.game.letters ch of
                                             Just index ->
-                                                AddLetter ch index
+                                                Decode.succeed (AddLetter ch index)
 
                                             Nothing ->
-                                                NoOp
+                                                Decode.fail "can't type that letter"
                                     )
-                                |> Maybe.withDefault NoOp
+                                |> Maybe.withDefault
+                                    (Decode.fail "can't type that letter")
 
                         else
-                            NoOp
+                            Decode.fail "length of key /= 1???"
             )
 
 
@@ -582,6 +614,35 @@ viewGame game =
             , Font.family [ Font.monospace ]
             , Font.bold
             , Font.size 24
+            , Element.above
+                (Element.el
+                    [ Background.color UI.white
+                    , Font.size 32
+                    , Element.paddingXY 30 16
+                    , Element.centerX
+                    , Element.alpha
+                        (if game.feedback == Idle then
+                            0.0
+
+                         else
+                            0.9
+                        )
+                    ]
+                    (Element.text <|
+                        case game.feedback of
+                            AlreadyFound word ->
+                                "Already found"
+
+                            Idle ->
+                                ""
+
+                            InvalidWord word ->
+                                "Bad word"
+
+                            WordFound word ->
+                                "Great!"
+                    )
+                )
             ]
             (guessToString game.reverseGuess
                 |> String.toUpper
@@ -606,7 +667,11 @@ viewGame game =
                     }
                 , UI.button []
                     { label = viewIcon Phosphor.keyReturn
-                    , onPress = Just SubmitGuess
+                    , onPress =
+                        game.dictionary
+                            |> RemoteData.toMaybe
+                            |> Maybe.map
+                                SubmitGuess
                     }
                 ]
             ]
