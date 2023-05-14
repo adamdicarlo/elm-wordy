@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Browser.Events exposing (onKeyDown)
+import Browser.Events
 import Dict
 import Dictionary
     exposing
@@ -12,6 +12,7 @@ import Dictionary
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
+import Element.Keyed
 import Element.Region as Region
 import Html exposing (Html)
 import Html.Attributes
@@ -19,10 +20,10 @@ import Http
 import Json.Decode as Decode
 import List.Extra as List
 import Phosphor
-import Process
 import Random exposing (Generator)
 import RemoteData exposing (WebData)
 import Task
+import Time
 import Tuple
 import UI
 
@@ -42,7 +43,7 @@ subscriptions model =
     case model.screen of
         Game ->
             Sub.batch
-                [ onKeyDown <| keyEventToCmd model
+                [ Browser.Events.onKeyDown (keyEventToCmd model)
                 ]
 
         _ ->
@@ -59,11 +60,11 @@ type Letter
 
 
 type Feedback
-    = AlreadyFound String
+    = AlreadyFound Time.Posix String
     | Idle
-    | InvalidWord String
-    | WordFound String
-    | WordTooShort String
+    | InvalidWord Time.Posix String
+    | WordFound Time.Posix String
+    | WordTooShort Time.Posix String
 
 
 type alias GameModel =
@@ -89,9 +90,8 @@ type Msg
       AddLetter Char Int
       -- User action: Erase last letter of guess
     | Backspace
-      -- User action: Submit the guess
-    | ClearFeedback
-    | SubmitGuess Dictionary
+    | PlayerPressedSubmit Dictionary
+    | SubmitGuess Dictionary Time.Posix
       -- User action: Shuffle the board
     | Shuffle
       -- User action: Start a new game
@@ -259,15 +259,12 @@ update msg ({ game } as model) =
                     , Cmd.none
                     )
 
-        ClearFeedback ->
-            ( { model
-                | game =
-                    { game | feedback = Idle }
-              }
-            , Cmd.none
+        PlayerPressedSubmit dictionary ->
+            ( model
+            , Task.perform (SubmitGuess dictionary) Time.now
             )
 
-        SubmitGuess dictionary ->
+        SubmitGuess dictionary time ->
             let
                 guess =
                     guessToString game.reverseGuess
@@ -281,17 +278,17 @@ update msg ({ game } as model) =
                 ( newFoundWords, feedback ) =
                     case ( isValid, isAlreadyFound ) of
                         ( True, True ) ->
-                            ( game.foundWords, AlreadyFound guess )
+                            ( game.foundWords, AlreadyFound time guess )
 
                         ( True, False ) ->
-                            ( guess :: game.foundWords, WordFound guess )
+                            ( guess :: game.foundWords, WordFound time guess )
 
                         ( False, _ ) ->
                             if String.length guess < 3 then
-                                ( game.foundWords, WordTooShort guess )
+                                ( game.foundWords, WordTooShort time guess )
 
                             else
-                                ( game.foundWords, InvalidWord guess )
+                                ( game.foundWords, InvalidWord time guess )
             in
             ( { model
                 | game =
@@ -467,7 +464,7 @@ keyEventToCmd model =
                     "Enter" ->
                         model.game.dictionary
                             |> RemoteData.toMaybe
-                            |> Maybe.map (\dict -> Decode.succeed (SubmitGuess dict))
+                            |> Maybe.map (\dict -> Decode.succeed (PlayerPressedSubmit dict))
                             |> Maybe.withDefault (Decode.fail "SubmitGuess without dictionary")
 
                     -- Backspace key
@@ -613,50 +610,75 @@ viewGame game =
                 |> Element.el [ Font.size 20 ]
             ]
         , viewLetters game.letters
-        , Element.el
-            [ Element.centerX
-            , Font.family [ Font.monospace ]
-            , Font.bold
-            , Font.size 24
-            , Element.above
-                (Element.el
-                    [ Background.color UI.white
-                    , Font.size 32
-                    , Element.paddingXY 30 16
-                    , Element.centerX
-                    , Element.alpha
-                        (if game.feedback == Idle then
-                            0.0
+        , Element.row
+            ([ Element.centerX
+             , Font.family [ Font.monospace ]
+             , Font.bold
+             , Font.size 24
+             ]
+                ++ (if game.feedback == Idle then
+                        []
 
-                         else
-                            0.9
-                        )
-                    ]
-                    (Element.text <|
-                        case game.feedback of
-                            AlreadyFound word ->
-                                "Already found " ++ word
+                    else
+                        let
+                            ( time, text ) =
+                                case game.feedback of
+                                    AlreadyFound time_ word ->
+                                        ( time_
+                                        , "Already found " ++ word
+                                        )
 
-                            Idle ->
-                                ""
+                                    Idle ->
+                                        ( Time.millisToPosix 0, "" )
 
-                            InvalidWord word ->
-                                "Not in word list: " ++ word
+                                    InvalidWord time_ _ ->
+                                        ( time_
+                                        , "Not in word list"
+                                        )
 
-                            WordFound _ ->
-                                "Great!"
+                                    WordFound time_ _ ->
+                                        ( time_
+                                        , "Great!"
+                                        )
 
-                            WordTooShort word ->
-                                word ++ " is too short"
-                    )
-                )
-            ]
-            (guessToString game.reverseGuess
-                |> String.toUpper
-                -- Hack: Always render at least a space, in order to reserve vertical space.
-                |> String.append " "
-                |> Element.text
+                                    WordTooShort time_ _ ->
+                                        ( time_
+                                        , "Too short"
+                                        )
+                        in
+                        [ Element.above <|
+                            Element.Keyed.el
+                                [ Element.centerX
+                                ]
+                                ( time |> Time.posixToMillis |> String.fromInt
+                                , Element.el
+                                    [ Background.color UI.pink
+                                    , Font.color UI.white
+                                    , Font.size 30
+                                    , Element.htmlAttribute (Html.Attributes.class "anim-fade-out")
+                                    , Element.paddingXY 30 16
+                                    ]
+                                    (Element.text text)
+                                )
+                        ]
+                   )
             )
+            [ Element.el
+                [ Element.paddingEach { bottom = 0, left = 0, right = 2, top = 0 }
+                ]
+                (guessToString game.reverseGuess
+                    |> String.toUpper
+                    |> Element.text
+                )
+            , Element.el
+                [ Element.htmlAttribute (Html.Attributes.class "anim-cursor-blink")
+                , Background.color UI.pink
+                , Element.width (Element.px 2)
+                , Element.height (Element.px 32)
+                , Element.alignTop
+                ]
+                (Element.text "")
+            ]
         , Element.row
             [ Element.spaceEvenly
             , Element.width Element.fill
@@ -678,7 +700,7 @@ viewGame game =
                         game.dictionary
                             |> RemoteData.toMaybe
                             |> Maybe.map
-                                SubmitGuess
+                                PlayerPressedSubmit
                     }
                 ]
             ]

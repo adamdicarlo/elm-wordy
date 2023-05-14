@@ -2,6 +2,7 @@ module UI exposing
     ( button
     , largeButton
     , letterButton
+    , pink
     , selectedLetterButton
     , white
     )

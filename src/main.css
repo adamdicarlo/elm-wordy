@@ -3,13 +3,31 @@
  * See https://css-tricks.com/box-sizing/#article-header-id-6
  */
 html {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
-*, *::before, *::after {
-  box-sizing: inherit;
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
 }
 
-html, body {
-  background: #F0F0F0;
-  font-family: sans-serif;
+html,
+body {
+    background: #f0f0f0;
+    font-family: sans-serif;
+}
+
+.fade-out {
+    animation: 0.8s ease-out fade-out 1;
+}
+
+@keyframes fade-out {
+    from {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(20px);
+        opacity: 0;
+    }
 }
