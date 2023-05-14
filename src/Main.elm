@@ -63,6 +63,7 @@ type Feedback
     | Idle
     | InvalidWord String
     | WordFound String
+    | WordTooShort String
 
 
 type alias GameModel =
@@ -278,15 +279,19 @@ update msg ({ game } as model) =
                     not <| eligibleWord guess game.foundWords
 
                 ( newFoundWords, feedback ) =
-                    if isValid then
-                        if isAlreadyFound then
+                    case ( isValid, isAlreadyFound ) of
+                        ( True, True ) ->
                             ( game.foundWords, AlreadyFound guess )
 
-                        else
+                        ( True, False ) ->
                             ( guess :: game.foundWords, WordFound guess )
 
-                    else
-                        ( game.foundWords, InvalidWord guess )
+                        ( False, _ ) ->
+                            if String.length guess < 3 then
+                                ( game.foundWords, WordTooShort guess )
+
+                            else
+                                ( game.foundWords, InvalidWord guess )
             in
             ( { model
                 | game =
@@ -297,8 +302,7 @@ update msg ({ game } as model) =
                         , reverseGuess = []
                     }
               }
-            , Process.sleep 1000
-                |> Task.perform (\_ -> ClearFeedback)
+            , Cmd.none
             )
 
         Shuffle ->
@@ -631,16 +635,19 @@ viewGame game =
                     (Element.text <|
                         case game.feedback of
                             AlreadyFound word ->
-                                "Already found"
+                                "Already found " ++ word
 
                             Idle ->
                                 ""
 
                             InvalidWord word ->
-                                "Bad word"
+                                "Not in word list: " ++ word
 
-                            WordFound word ->
+                            WordFound _ ->
                                 "Great!"
+
+                            WordTooShort word ->
+                                word ++ " is too short"
                     )
                 )
             ]
