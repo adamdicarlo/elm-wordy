@@ -18,6 +18,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Http
 import Json.Decode as Decode
+import Json.Encode as Encode
 import List.Extra as List
 import Phosphor
 import Random exposing (Generator)
@@ -28,7 +29,11 @@ import Tuple
 import UI
 
 
-main : Program () Model Msg
+type alias Flags =
+    Encode.Value
+
+
+main : Program Flags Model Msg
 main =
     Browser.document
         { init = init
@@ -106,14 +111,31 @@ type Msg
     | NoOp
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    let
+        letters =
+            flags
+                |> Decode.decodeValue
+                    (Decode.field "letters" Decode.string
+                        |> Decode.andThen
+                            (\string ->
+                                if String.length string == 9 then
+                                    Decode.succeed string
+
+                                else
+                                    Decode.fail "Wrong length"
+                            )
+                    )
+                |> Result.withDefault ""
+                |> stringToLetterList
+    in
     ( { screen = Menu
       , game =
             { dictionary = RemoteData.Loading
             , feedback = Idle
             , foundWords = []
-            , letters = []
+            , letters = letters
             , reverseGuess = []
             , totalWords = 0
             }
@@ -328,13 +350,16 @@ update msg ({ game } as model) =
         NewGameNumbers ( wordIndex, shuffleNumbers ) ->
             let
                 letters =
-                    nineLetterWords game.dictionary
-                        |> Dict.keys
-                        |> List.drop wordIndex
-                        |> List.head
-                        |> Maybe.withDefault fallbackWord
-                        |> stringToLetterList
-                        |> shuffle shuffleNumbers
+                    if List.isEmpty game.letters then
+                        nineLetterWords game.dictionary
+                            |> Dict.keys
+                            |> List.getAt wordIndex
+                            |> Maybe.withDefault fallbackWord
+                            |> stringToLetterList
+                            |> shuffle shuffleNumbers
+
+                    else
+                        game.letters
             in
             ( { model
                 | screen = Game
