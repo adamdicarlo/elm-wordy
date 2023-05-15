@@ -44,8 +44,15 @@ pink =
 
 
 button : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
-button attrs =
-    Input.button (buttonCommon ++ attrs)
+button attrs { label, onPress } =
+    Element.el
+        ([ buttonCommon
+         , attrs
+         ]
+            |> List.concat
+            |> withMaybeOnPress onPress
+        )
+        label
 
 
 largeButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
@@ -78,8 +85,18 @@ largeButton attrs =
         )
 
 
+withMaybeOnPress : Maybe msg -> List (Element.Attribute msg) -> List (Element.Attribute msg)
+withMaybeOnPress maybeOnPress attrs =
+    case maybeOnPress of
+        Just onPress ->
+            Events.onClick onPress :: attrs
+
+        Nothing ->
+            attrs
+
+
 letterCommon : Element.Color -> Element.Color -> Maybe msg -> List (Element.Attribute msg)
-letterCommon bgColor fontColor onPress =
+letterCommon bgColor fontColor maybeOnPress =
     -- line height is handled by element.spacing
     [ Attributes.style "transition" "all 0.1s"
         |> Element.htmlAttribute
@@ -93,10 +110,7 @@ letterCommon bgColor fontColor onPress =
     , Font.size 48
     , Font.bold
     ]
-        ++ (onPress
-                |> Maybe.map (\msg -> [ Events.onClick msg ])
-                |> Maybe.withDefault []
-           )
+        |> withMaybeOnPress maybeOnPress
 
 
 letterButton : { letter : String, onPress : Maybe msg } -> Element msg
