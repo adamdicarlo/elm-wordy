@@ -674,6 +674,10 @@ viewGame game =
                         [ Element.above <|
                             Element.Keyed.el
                                 [ Element.centerX
+                                , Element.htmlAttribute
+                                    (Html.Attributes.style "pointer-events"
+                                        "none"
+                                    )
                                 ]
                                 ( time |> Time.posixToMillis |> String.fromInt
                                 , Element.el
