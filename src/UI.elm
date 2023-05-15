@@ -10,14 +10,15 @@ module UI exposing
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
-import Html.Attributes
+import Html.Attributes as Attributes
 
 
 unselectable : Element.Attribute msg
 unselectable =
-    Element.htmlAttribute (Html.Attributes.attribute "user-select" "none")
+    Element.htmlAttribute (Attributes.attribute "user-select" "none")
 
 
 buttonCommon : List (Element.Attribute msg)
@@ -77,35 +78,46 @@ largeButton attrs =
         )
 
 
-letterCommon : List (Element.Attribute msg)
-letterCommon =
+letterCommon : Element.Color -> Element.Color -> Maybe msg -> List (Element.Attribute msg)
+letterCommon bgColor fontColor onPress =
     -- line height is handled by element.spacing
-    [ Element.pointer
+    [ Attributes.style "transition" "all 0.1s"
+        |> Element.htmlAttribute
+    , Background.color bgColor
+    , Element.width (Element.px 100)
+    , Element.height (Element.px 100)
+    , Element.pointer
     , Border.rounded 12
-    , Font.center
+    , Font.color fontColor
     , Font.family [ Font.monospace ]
     , Font.size 48
     , Font.bold
-    , Element.width (Element.px 100)
-    , Element.height (Element.px 100)
     ]
+        ++ (onPress
+                |> Maybe.map (\msg -> [ Events.onClick msg ])
+                |> Maybe.withDefault []
+           )
 
 
-letterButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
-letterButton attrs =
-    [ letterCommon
-    , [ Background.color white, Font.color pink ]
-    , attrs
-    ]
-        |> List.concat
-        |> Input.button
+letterButton : { letter : String, onPress : Maybe msg } -> Element msg
+letterButton { letter, onPress } =
+    Element.el
+        (letterCommon white pink onPress)
+        (Element.el
+            [ Element.centerX
+            , Element.centerY
+            ]
+            (Element.text letter)
+        )
 
 
-selectedLetterButton : List (Element.Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
-selectedLetterButton attrs =
-    [ letterCommon
-    , [ Background.color pink, Font.color white ]
-    , attrs
-    ]
-        |> List.concat
-        |> Input.button
+selectedLetterButton : { letter : String, onPress : Maybe msg } -> Element msg
+selectedLetterButton { letter, onPress } =
+    Element.el
+        (Element.scale 0.85 :: letterCommon pink white onPress)
+        (Element.el
+            [ Element.centerX
+            , Element.centerY
+            ]
+            (Element.text letter)
+        )

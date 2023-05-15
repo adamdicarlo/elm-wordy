@@ -15,7 +15,7 @@ import Element.Font as Font
 import Element.Keyed
 import Element.Region as Region
 import Html exposing (Html)
-import Html.Attributes
+import Html.Attributes as Attributes
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -675,16 +675,14 @@ viewGame game =
                             Element.Keyed.el
                                 [ Element.centerX
                                 , Element.htmlAttribute
-                                    (Html.Attributes.style "pointer-events"
-                                        "none"
-                                    )
+                                    (Attributes.style "pointer-events" "none")
                                 ]
                                 ( time |> Time.posixToMillis |> String.fromInt
                                 , Element.el
                                     [ Background.color UI.pink
                                     , Font.color UI.white
                                     , Font.size 30
-                                    , Element.htmlAttribute (Html.Attributes.class "anim-fade-out")
+                                    , Element.htmlAttribute (Attributes.class "anim-fade-out")
                                     , Element.paddingXY 30 16
                                     ]
                                     (Element.text text)
@@ -700,7 +698,7 @@ viewGame game =
                     |> Element.text
                 )
             , Element.el
-                [ Element.htmlAttribute (Html.Attributes.class "anim-cursor-blink")
+                [ Element.htmlAttribute (Attributes.class "anim-cursor-blink")
                 , Background.color UI.pink
                 , Element.width (Element.px 2)
                 , Element.height (Element.px 32)
@@ -762,21 +760,21 @@ viewLetters letters =
         |> Element.column
             [ Element.spacing 16
             , Element.htmlAttribute
-                (Html.Attributes.attribute "unselectable" "on")
+                (Attributes.attribute "unselectable" "on")
             ]
 
 
 viewLetter : Int -> Letter -> Element Msg
 viewLetter index (Letter ch selected) =
     let
-        label =
-            ch |> String.fromChar |> String.toUpper |> Element.text
+        letter =
+            ch |> String.fromChar |> String.toUpper
     in
     if selected then
-        UI.selectedLetterButton [] { label = label, onPress = Nothing }
+        UI.selectedLetterButton { letter = letter, onPress = Nothing }
 
     else
-        UI.letterButton [] { label = label, onPress = Just (AddLetter ch index) }
+        UI.letterButton { letter = letter, onPress = Just (AddLetter ch index) }
 
 
 viewFoundWords : List String -> Element Msg
