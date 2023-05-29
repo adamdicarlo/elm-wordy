@@ -37,7 +37,7 @@
       "nodemon",
       "-w",
       "vendor/dolph/dictionary/popular.txt",
-      "scripts/generate-dictionary-json.js"
+      "scripts/generate-dictionary.js"
     ],
     "title": "watch dictionary",
     "status": {

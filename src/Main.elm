@@ -68,8 +68,7 @@ type Feedback
 
 
 type alias GameModel =
-    { dictionary : WebData Dictionary
-    , feedback : Feedback
+    { feedback : Feedback
     , foundWords : List String
     , letters : List Letter
     , reverseGuess : List ( Char, Int )
@@ -90,14 +89,12 @@ type Msg
       AddLetter Char Int
       -- User action: Erase last letter of guess
     | Backspace
-    | PlayerPressedSubmit Dictionary
-    | SubmitGuess Dictionary Time.Posix
+    | PlayerPressedSubmit
+    | SubmitGuess Time.Posix
       -- User action: Shuffle the board
     | Shuffle
       -- User action: Start a new game
     | NewGame
-      -- AJAX response for dictionary (uses RemoteData package)
-    | DictionaryResponse (WebData Dictionary)
       -- RNG response: Numbers used for shuffling letters
     | ShuffleOrdering (List Int)
       -- RNG response: Numbers used for picking a 9-letter word, then shuffling it, when
@@ -127,39 +124,20 @@ init flags =
     in
     ( { screen = Menu
       , game =
-            { dictionary = RemoteData.Loading
-            , feedback = Idle
+            { feedback = Idle
             , foundWords = []
             , letters = letters
             , reverseGuess = []
             , totalWords = 0
             }
       }
-    , getDictionary
+    , Cmd.none
     )
 
 
 fallbackWord : String
 fallbackWord =
     "flowering"
-
-
-getDictionary : Cmd Msg
-getDictionary =
-    Http.get "dictionary.json" Dictionary.decode
-        |> RemoteData.sendRequest
-        |> Cmd.map DictionaryResponse
-
-
-getWords : WebData Dictionary -> Dictionary
-getWords dictionary =
-    let
-        fallback : Dictionary
-        fallback =
-            Dict.singleton fallbackWord ()
-    in
-    RemoteData.toMaybe dictionary
-        |> Maybe.withDefault fallback
 
 
 guessToString : List ( Char, Int ) -> String
@@ -204,8 +182,8 @@ stringToLetterList =
     String.foldr (\char accum -> Letter char False :: accum) []
 
 
-totalWords : WebData Dictionary -> List Letter -> Int
-totalWords dictionary letters =
+totalWords : List Letter -> Int
+totalWords letters =
     let
         charList =
             lettersToCharList letters
@@ -213,7 +191,7 @@ totalWords dictionary letters =
         predicate word _ =
             isWordInBoard word charList
     in
-    getWords dictionary
+    Dictionary.words
         |> Dict.filter predicate
         |> Dict.size
 
@@ -221,32 +199,6 @@ totalWords dictionary letters =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ game } as model) =
     case msg of
-        DictionaryResponse response ->
-            case response of
-                RemoteData.Success data ->
-                    ( { model
-                        | game =
-                            { game
-                                | dictionary =
-                                    RemoteData.Success data
-                            }
-                      }
-                    , Cmd.none
-                    )
-
-                RemoteData.Failure err ->
-                    ( { model
-                        | game =
-                            { game
-                                | dictionary = RemoteData.Failure err
-                            }
-                      }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    ( model, Cmd.none )
-
         AddLetter ch index ->
             ( { model
                 | game =
@@ -276,18 +228,18 @@ update msg ({ game } as model) =
                     , Cmd.none
                     )
 
-        PlayerPressedSubmit dictionary ->
+        PlayerPressedSubmit ->
             ( model
-            , Task.perform (SubmitGuess dictionary) Time.now
+            , Task.perform SubmitGuess Time.now
             )
 
-        SubmitGuess dictionary time ->
+        SubmitGuess time ->
             let
                 guess =
                     guessToString game.reverseGuess
 
                 isValid =
-                    validWord guess dictionary
+                    validWord guess Dictionary.words
 
                 isAlreadyFound =
                     not <| eligibleWord guess game.foundWords
@@ -336,7 +288,7 @@ update msg ({ game } as model) =
         NewGame ->
             let
                 generator =
-                    Random.pair (selectWordGenerator game.dictionary) (shuffleWordGenerator 9)
+                    Random.pair selectWordGenerator (shuffleWordGenerator 9)
             in
             ( model
             , Random.generate NewGameNumbers generator
@@ -346,7 +298,7 @@ update msg ({ game } as model) =
             let
                 letters =
                     if List.isEmpty game.letters then
-                        nineLetterWords game.dictionary
+                        nineLetterWords
                             |> Dict.keys
                             |> List.getAt wordIndex
                             |> Maybe.withDefault fallbackWord
@@ -361,7 +313,7 @@ update msg ({ game } as model) =
                 , game =
                     { game
                         | letters = letters
-                        , totalWords = totalWords game.dictionary letters
+                        , totalWords = totalWords letters
                         , reverseGuess = []
                         , foundWords = []
                     }
@@ -375,22 +327,22 @@ update msg ({ game } as model) =
             )
 
 
-nineLetterWords : WebData Dictionary -> Dictionary
-nineLetterWords dictionary =
+nineLetterWords : Dictionary
+nineLetterWords =
     let
         predicate : String -> () -> Bool
         predicate word _ =
             String.length word == 9
     in
-    getWords dictionary
+    Dictionary.words
         |> Dict.filter predicate
 
 
-selectWordGenerator : WebData Dictionary -> Generator Int
-selectWordGenerator dictionary =
+selectWordGenerator : Generator Int
+selectWordGenerator =
     let
         nineLetterWordCount =
-            Dict.size (nineLetterWords dictionary)
+            Dict.size nineLetterWords
     in
     Random.int 0 (nineLetterWordCount - 1)
 
@@ -482,10 +434,7 @@ keyEventToCmd model =
                 case key of
                     -- Enter key
                     "Enter" ->
-                        model.game.dictionary
-                            |> RemoteData.toMaybe
-                            |> Maybe.map (\dict -> Decode.succeed (PlayerPressedSubmit dict))
-                            |> Maybe.withDefault (Decode.fail "SubmitGuess without dictionary")
+                        Decode.succeed PlayerPressedSubmit
 
                     -- Backspace key
                     "Backspace" ->
@@ -526,54 +475,24 @@ view model =
     }
 
 
-httpErrorToString : Http.Error -> String
-httpErrorToString error =
-    case error of
-        Http.BadPayload desc _ ->
-            "Bad payload: " ++ desc
-
-        Http.BadStatus { status } ->
-            "Bad status: " ++ String.fromInt status.code ++ " " ++ status.message
-
-        Http.BadUrl _ ->
-            "Bad URL"
-
-        Http.Timeout ->
-            "Timeout"
-
-        Http.NetworkError ->
-            "Network error (details unknown)"
-
-
 viewMenu : Model -> Html Msg
 viewMenu model =
     let
         content =
-            case model.game.dictionary of
-                RemoteData.NotAsked ->
-                    Element.paragraph [] [ Element.text "Starting" ]
-
-                RemoteData.Loading ->
-                    Element.paragraph [] [ Element.text "Loading..." ]
-
-                RemoteData.Failure err ->
-                    Element.paragraph [] [ Element.text ("Error: " ++ httpErrorToString err) ]
-
-                RemoteData.Success _ ->
-                    Element.column
-                        [ Element.spacing 40
+            Element.column
+                [ Element.spacing 40
+                ]
+                [ UI.largeButton []
+                    { label = Element.text "Play"
+                    , onPress = Just NewGame
+                    }
+                    |> Element.el [ Element.centerX ]
+                , Element.row []
+                    [ Element.paragraph [ Element.paddingXY 32 0 ]
+                        [ Element.text "How many words can you find? Words must be at least three letters."
                         ]
-                        [ UI.largeButton []
-                            { label = Element.text "Play"
-                            , onPress = Just NewGame
-                            }
-                            |> Element.el [ Element.centerX ]
-                        , Element.row []
-                            [ Element.paragraph [ Element.paddingXY 32 0 ]
-                                [ Element.text "How many words can you find? Words must be at least three letters."
-                                ]
-                            ]
-                        ]
+                    ]
+                ]
     in
     Element.column
         [ Element.centerX
@@ -718,11 +637,7 @@ viewGame game =
                     }
                 , UI.button []
                     { label = viewIcon Phosphor.keyReturn
-                    , onPress =
-                        game.dictionary
-                            |> RemoteData.toMaybe
-                            |> Maybe.map
-                                PlayerPressedSubmit
+                    , onPress = Just PlayerPressedSubmit
                     }
                 ]
             ]

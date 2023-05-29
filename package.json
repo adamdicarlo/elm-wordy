@@ -9,10 +9,9 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "postinstall": "elm-tooling install",
-    "generate-dictionary": "mkdir build -p; scripts/generate-dictionary-json.js",
+    "generate-dictionary": "mkdir build -p; scripts/generate-dictionary.js",
     "prestart": "rm -rf build; mkdir build",
     "start": "run-pty run-pty-dev.json",
-    "prebuild": "yarn run generate-dictionary",
     "build": "elm-watch make --optimize"
   },
   "dependencies": {},
