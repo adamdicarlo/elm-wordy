@@ -3,12 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict
-import Dictionary
-    exposing
-        ( Dictionary
-        , DictionaryResponse
-        , dictionaryFromResponse
-        )
+import Dictionary exposing (Dictionary)
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
@@ -102,7 +97,7 @@ type Msg
       -- User action: Start a new game
     | NewGame
       -- AJAX response for dictionary (uses RemoteData package)
-    | DictionaryResponse (WebData DictionaryResponse)
+    | DictionaryResponse (WebData Dictionary)
       -- RNG response: Numbers used for shuffling letters
     | ShuffleOrdering (List Int)
       -- RNG response: Numbers used for picking a 9-letter word, then shuffling it, when
@@ -233,7 +228,7 @@ update msg ({ game } as model) =
                         | game =
                             { game
                                 | dictionary =
-                                    RemoteData.Success (dictionaryFromResponse data.dictionary)
+                                    RemoteData.Success data
                             }
                       }
                     , Cmd.none
