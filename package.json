@@ -10,9 +10,9 @@
   "scripts": {
     "postinstall": "elm-tooling install",
     "generate-dictionary": "mkdir build -p; scripts/generate-dictionary.js",
-    "prestart": "rm -rf build; mkdir build",
-    "start": "run-pty run-pty-dev.json",
-    "build": "elm-watch make --optimize"
+    "clean": "rm -rf build; mkdir build",
+    "start": "npm run clean; run-pty run-pty-dev.json",
+    "build": "npm run clean; cp src/index.html build/; elm-watch make --optimize"
   },
   "dependencies": {},
   "devDependencies": {
