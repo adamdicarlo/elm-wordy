@@ -17,4 +17,4 @@ To try it out, clone this repo and run these commands:
 
 (If you don't have `yarn` installed, just use `npm` instead!)
 
-![screenshot](screenshots/shot1.png)
+<img src="screenshots/shot1.png" width="40%" />
