@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (GameModel, Letter(..), Model, Msg(..), guessToString, init, isWordInBoard, main, stringToLetterList, totalWords, update)
 
 import Browser
 import Browser.Events
@@ -11,13 +11,11 @@ import Element.Keyed
 import Element.Region as Region
 import Html exposing (Html)
 import Html.Attributes as Attributes
-import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import List.Extra as List
 import Phosphor
 import Random exposing (Generator)
-import RemoteData exposing (WebData)
 import Task
 import Time
 import Tuple
@@ -182,8 +180,8 @@ stringToLetterList =
     String.foldr (\char accum -> Letter char False :: accum) []
 
 
-totalWords : List Letter -> Int
-totalWords letters =
+totalWords : Dictionary -> List Letter -> Int
+totalWords dictionary letters =
     let
         charList =
             lettersToCharList letters
@@ -191,7 +189,7 @@ totalWords letters =
         predicate word _ =
             isWordInBoard word charList
     in
-    Dictionary.words
+    dictionary
         |> Dict.filter predicate
         |> Dict.size
 
@@ -313,7 +311,7 @@ update msg ({ game } as model) =
                 , game =
                     { game
                         | letters = letters
-                        , totalWords = totalWords letters
+                        , totalWords = totalWords Dictionary.words letters
                         , reverseGuess = []
                         , foundWords = []
                     }
@@ -476,7 +474,7 @@ view model =
 
 
 viewMenu : Model -> Html Msg
-viewMenu model =
+viewMenu _ =
     let
         content =
             Element.column

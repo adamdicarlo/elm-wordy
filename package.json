@@ -17,14 +17,10 @@
   "trustedDependencies": ["node-pty"],
   "dependencies": {},
   "devDependencies": {
-    "elm-test": "0.19.1-revision9",
-    "elm-watch": "^1.1.2",
+    "elm-test": "^0.19.1-revision12",
+    "elm-watch": "^1.2.0-beta.4",
     "nodemon": "^2.0.22",
-    "run-pty": "^4.0.3",
-    "split2": "^4.1.0",
-    "st": "^3.0.0",
-    "through2": "^4.0.2",
-    "through2-filter": "^3.0.0",
-    "through2-map": "^3.0.0"
+    "run-pty": "^4.1.0",
+    "st": "^3.0.0"
   }
 }

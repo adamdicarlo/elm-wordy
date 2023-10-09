@@ -1,18 +1,29 @@
-module Tests exposing (all, dictionary, start, updateModel, withReverseGuess)
+module Tests exposing (all)
 
 import Dict
 import Expect
-import Letter exposing (Letter(..))
-import Model exposing (GameModel, Model, Msg(..), guessToString, init, isWordInBoard, stringToLetterList, totalWords)
-import RemoteData exposing (WebData)
+import Json.Encode
+import Main
+    exposing
+        ( Letter(..)
+        , Model
+        , Msg(..)
+        , guessToString
+        , init
+        , isWordInBoard
+        , stringToLetterList
+        , totalWords
+        , update
+        )
 import Test exposing (..)
-import Update exposing (update)
 
 
+start : Model
 start =
-    Tuple.first init
+    Tuple.first (init Json.Encode.null)
 
 
+dictionary : Dict.Dict String ()
 dictionary =
     -- Four words that match 9-letter "flowering" (including "flowering" itself)
     Dict.singleton "flowering" ()
@@ -23,7 +34,6 @@ dictionary =
         |> Dict.insert "hay" ()
         |> Dict.insert "success" ()
         |> Dict.insert "partition" ()
-        |> RemoteData.Success
 
 
 updateModel : Msg -> Model -> Model
