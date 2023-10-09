@@ -1,6 +1,17 @@
 node_modules
-dist
+build
 
 elm-stuff/*
 tests/elm-stuff/*
 .parcel-cache
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+

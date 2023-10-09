@@ -8,16 +8,16 @@
   "author": "Adam DiCarlo <adam.dicarlo@gmail.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "postinstall": "elm-tooling install",
+    "postinstall": "cd node_modules/node-pty && node-gyp-build",
     "generate-dictionary": "mkdir build -p; scripts/generate-dictionary.js",
     "clean": "rm -rf build; mkdir build",
     "start": "npm run clean; run-pty run-pty-dev.json",
     "build": "npm run clean; cp src/index.html build/; elm-watch make --optimize"
   },
+  "trustedDependencies": ["node-pty"],
   "dependencies": {},
   "devDependencies": {
     "elm-test": "0.19.1-revision9",
-    "elm-tooling": "^1.8.0",
     "elm-watch": "^1.1.2",
     "nodemon": "^2.0.22",
     "run-pty": "^4.0.3",

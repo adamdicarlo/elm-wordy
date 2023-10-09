@@ -1,5 +1,14 @@
 [
   {
+    "command": ["st", "-p", "2345", "-nc", "-d", "build", "-i", "index.html"],
+    "title": "serve http://localhost:2345/",
+    "status": {
+      "listening at http.*:2345": ["✅", "+"],
+      "ERROR": ["🚨", "E"],
+      "200": null
+    }
+  },
+  {
     "command": ["elm-watch", "hot"],
     "title": "elm-watch",
     "status": {
@@ -8,15 +17,6 @@
       "✅": ["✅", "+"]
     },
     "defaultStatus": ["⏳", "W"]
-  },
-  {
-    "command": ["st", "-p", "2345", "-nc", "-d", "build"],
-    "title": "serve",
-    "status": {
-      "listening at http.*:2345": ["✅", "+"],
-      "ERROR": ["🚨", "E"],
-      "200": null
-    }
   },
   {
     "command": [
