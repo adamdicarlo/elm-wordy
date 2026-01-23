@@ -104,6 +104,7 @@ type Msg
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
+        letters : List Letter
         letters =
             flags
                 |> Decode.decodeValue
@@ -158,6 +159,7 @@ areCharsInBoard word boardChars =
 
         ch :: restChars ->
             let
+                restBoardChars : List Char
                 restBoardChars =
                     List.remove ch boardChars
             in
@@ -183,6 +185,7 @@ stringToLetterList =
 totalWords : Dictionary -> List Letter -> Int
 totalWords dictionary letters =
     let
+        charList : List Char
         charList =
             lettersToCharList letters
 
@@ -233,12 +236,15 @@ update msg ({ game } as model) =
 
         SubmitGuess time ->
             let
+                guess : String
                 guess =
                     guessToString game.reverseGuess
 
+                isValid : Bool
                 isValid =
                     validWord guess Dictionary.words
 
+                isAlreadyFound : Bool
                 isAlreadyFound =
                     not <| eligibleWord guess game.foundWords
 
@@ -271,6 +277,7 @@ update msg ({ game } as model) =
 
         Shuffle ->
             let
+                generator : Generator (List Int)
                 generator =
                     shuffleWordGenerator (List.length model.game.letters)
             in
@@ -285,6 +292,7 @@ update msg ({ game } as model) =
 
         NewGame ->
             let
+                generator : Generator ( Int, List Int )
                 generator =
                     Random.pair selectWordGenerator (shuffleWordGenerator 9)
             in
@@ -294,6 +302,7 @@ update msg ({ game } as model) =
 
         NewGameNumbers ( wordIndex, shuffleNumbers ) ->
             let
+                letters : List Letter
                 letters =
                     if List.isEmpty game.letters then
                         nineLetterWords
@@ -339,6 +348,7 @@ nineLetterWords =
 selectWordGenerator : Generator Int
 selectWordGenerator =
     let
+        nineLetterWordCount : Int
         nineLetterWordCount =
             Dict.size nineLetterWords
     in
@@ -357,6 +367,7 @@ shuffle randoms letters =
         zipped =
             List.map2 (\a b -> ( a, b )) randoms letters
 
+        sorted : List ( Int, Letter )
         sorted =
             List.sortBy Tuple.first zipped
     in
@@ -366,6 +377,7 @@ shuffle randoms letters =
 findUnselectedLetter : List Letter -> Char -> Maybe Int
 findUnselectedLetter letters sought =
     let
+        predicate : Letter -> Bool
         predicate (Letter ch selected) =
             ch == sought && not selected
     in
@@ -476,6 +488,7 @@ view model =
 viewMenu : Model -> Html Msg
 viewMenu _ =
     let
+        content : Element Msg
         content =
             Element.column
                 [ Element.spacing 40
@@ -653,6 +666,7 @@ viewGame game =
 viewLetters : List Letter -> Element Msg
 viewLetters letters =
     let
+        rows : List (List (Element Msg))
         rows =
             letters
                 |> List.indexedMap viewLetter
@@ -675,6 +689,7 @@ viewLetters letters =
 viewLetter : Int -> Letter -> Element Msg
 viewLetter index (Letter ch selected) =
     let
+        letter : String
         letter =
             ch |> String.fromChar |> String.toUpper
     in
@@ -688,6 +703,7 @@ viewLetter index (Letter ch selected) =
 viewFoundWords : List String -> Element Msg
 viewFoundWords foundWords =
     let
+        children : List (Element msg)
         children =
             foundWords
                 |> List.map (\w -> Element.el [] (String.toUpper w |> Element.text))
