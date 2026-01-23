@@ -450,6 +450,9 @@ keyEventToCmd model =
                     "Backspace" ->
                         Decode.succeed Backspace
 
+                    " " ->
+                        Decode.succeed Shuffle
+
                     other ->
                         if String.length other == 1 then
                             other
