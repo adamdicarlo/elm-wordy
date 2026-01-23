@@ -1,7 +1,7 @@
-
 module Dictionary exposing (Dictionary, words)
 
 import Dict exposing (Dict)
+
 
 {-| The set of legal words.
 

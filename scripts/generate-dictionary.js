@@ -17,10 +17,10 @@ const legalWords = allWords.filter(
 )
 
 const strings = legalWords.map((word) => `"${word}"`).join("\n    , ")
-const elmModule = `
-module Dictionary exposing (Dictionary, words)
+const elmModule = `module Dictionary exposing (Dictionary, words)
 
 import Dict exposing (Dict)
+
 
 {-| The set of legal words.
 
