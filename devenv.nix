@@ -69,6 +69,8 @@
 
   # https://devenv.sh/basics/
   enterShell = ''
+    bun install
+
     echo -e '\nAll set! The following project commands are available in this shell:\n'
 
     ${pkgs.gnused}/bin/sed -e 's| |••|g' -e 's|=| |' <<EOF | ${pkgs.util-linuxMinimal}/bin/column -t | ${pkgs.gnused}/bin/sed -e 's|^|> |' -e 's|••| |g'
