@@ -16,6 +16,7 @@
   # https://devenv.sh/languages/
   languages.elm.enable = true;
   languages.elm.lsp.enable = true;
+  languages.javascript.bun.install.enable = true;
 
   # https://devenv.sh/processes/
 
