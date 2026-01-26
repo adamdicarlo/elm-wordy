@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
-import { execSync } from "child_process"
 import { readFileSync, writeFileSync } from "fs"
 import { relative } from "path"
 
-const dictionaryPath = new URL(
-    "../vendor/dolph/dictionary/popular.txt",
-    import.meta.url
-)
-const targetPath = new URL("../generated/Dictionary.elm", import.meta.url)
+const PROJECT_ROOT = process.env.DEVENV_ROOT;
+if (!PROJECT_ROOT) {
+  throw Error("Script must be run from within a devenv shell");
+}
+
+const dictionaryPath = `${PROJECT_ROOT}/vendor/dolph/dictionary/popular.txt`;
+const targetPath = `${PROJECT_ROOT}/generated/Dictionary.elm`;
 
 const rawContent = readFileSync(dictionaryPath, { encoding: "utf8" })
 const allWords = rawContent.split("\n")
@@ -47,4 +48,4 @@ wordList =
 
 writeFileSync(targetPath, elmModule)
 
-console.log(`Generated ${relative(process.cwd(), targetPath.pathname)}`)
+console.log(`Generated ${relative(process.cwd(), targetPath)}`)

@@ -43,16 +43,6 @@
 </head>
 <body>
   <main id="root"></main>
-  <script src="main.js"></script>
-  <script>
-    const params = new URLSearchParams(window.location.search)
-    console.log({ letters: params.get('letters') })
-    Elm.Main.init({
-      flags: {
-        letters: params.get('letters'),
-      },
-      node: document.getElementById('root')
-    })
-  </script>
+  <script src="src/index.mjs" type="module"></script>
 </body>
 </html>

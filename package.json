@@ -7,19 +7,13 @@
   "repository": "https://github.com/adamdicarlo/elm-wordy.git",
   "author": "Adam DiCarlo <elm-wordy@bikko.org>",
   "license": "BSD-3-Clause",
-  "scripts": {
-    "generate-dictionary": "mkdir build -p; scripts/generate-dictionary.js",
-    "clean": "rm -rf build; mkdir build",
-    "start": "npm run clean; run-pty run-pty-dev.json",
-    "build": "npm run clean; cp src/index.html build/; elm-watch make --optimize"
-  },
-  "trustedDependencies": ["node-pty"],
   "dependencies": {},
   "devDependencies": {
     "elm-test": "^0.19.1-revision17",
     "elm-watch": "^1.2.3",
     "nodemon": "^3.1.11",
-    "run-pty": "^6.0.0",
-    "st": "^3.0.3"
+    "st": "^3.0.3",
+    "vite": "^7.3.1",
+    "vite-plugin-elm-watch": "^1.4.4"
   }
 }
