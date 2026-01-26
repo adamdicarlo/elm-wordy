@@ -20,7 +20,7 @@ This project uses [devenv](https://devenv.sh/), which means it should run locall
    ```bash
       devenv shell
    ```
-4. Run `npm start`
+1. Run `npm start`
 1. Open up [http://localhost:2345/](http://localhost:2345/) in your browser.
 
 <img src="screenshots/shot1.png" width="40%" />

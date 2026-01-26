@@ -3,18 +3,18 @@
 import { readFileSync, writeFileSync } from "fs"
 import { relative } from "path"
 
-const PROJECT_ROOT = process.env.DEVENV_ROOT;
+const PROJECT_ROOT = process.env.DEVENV_ROOT
 if (!PROJECT_ROOT) {
-  throw Error("Script must be run from within a devenv shell");
+  throw Error("Script must be run from within a devenv shell")
 }
 
-const dictionaryPath = `${PROJECT_ROOT}/vendor/dolph/dictionary/popular.txt`;
-const targetPath = `${PROJECT_ROOT}/generated/Dictionary.elm`;
+const dictionaryPath = `${PROJECT_ROOT}/vendor/dolph/dictionary/popular.txt`
+const targetPath = `${PROJECT_ROOT}/generated/Dictionary.elm`
 
 const rawContent = readFileSync(dictionaryPath, { encoding: "utf8" })
 const allWords = rawContent.split("\n")
 const legalWords = allWords.filter(
-    (rawWord) => rawWord.length >= 3 && rawWord.length <= 9
+  (rawWord) => rawWord.length >= 3 && rawWord.length <= 9,
 )
 
 const strings = legalWords.map((word) => `"${word}"`).join("\n    , ")
