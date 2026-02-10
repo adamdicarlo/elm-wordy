@@ -33,18 +33,8 @@
       description = "Clean build outputs";
     };
     format = {
-      exec = ''
-        PRETTIER_ARG=--write
-        ELM_FORMAT_ARG=--yes
-        if [[ "$1" == "--check" ]]; then
-          PRETTIER_ARG=--check
-          ELM_FORMAT_ARG=--validate
-        fi
-        cd "$DEVENV_ROOT"
-        bunx prettier "$PRETTIER_ARG" .
-        bunx elm-format "$ELM_FORMAT_ARG" ./src
-      '';
-      description = "Format code. Pass --check to only check formatting.";
+      exec = ''cd "$DEVENV_ROOT" && bunx prettier --write .'';
+      description = "Format all code";
     };
     generate-dictionary = {
       exec = ./scripts/generate-dictionary.js;
@@ -57,10 +47,16 @@
     };
     tests = {
       exec = ''
-        cd "$DEVENV_ROOT"
-        format --check
+        set -e
+        ESC=$'\033'
+        PINK=$ESC[35m$ESC[1m
+        RESET=$ESC[0m
 
-        echo >&2 -e "\n# Running elm-test"
+        cd "$DEVENV_ROOT"
+        echo >&2 -e "\n$PINK# Running prettier$RESET"
+        bunx prettier -c .
+
+        echo >&2 -e "\n$PINK# Running elm-test$RESET"
         bunx elm-test
       '';
       description = "Run tests";
