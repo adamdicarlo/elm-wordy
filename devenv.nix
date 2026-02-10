@@ -25,8 +25,8 @@
   # https://devenv.sh/scripts/
   scripts = {
     build = {
-      exec = ''cd "$DEVENV_ROOT" && clean && generate-dictionary && bunx vite build'';
-      description = "Build the project for production";
+      exec = ''cd "$DEVENV_ROOT" && clean && generate-dictionary && bunx vite build "$@"'';
+      description = "Build the project for production; params are passed through to Vite";
     };
     clean = {
       exec = ''rm -rf "$DEVENV_ROOT/dist"'';
